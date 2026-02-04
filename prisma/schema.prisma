@@ -1,0 +1,256 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────
+
+enum Division {
+  D1
+  D2
+  D3
+}
+
+enum ScrapeStatus {
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum NotificationType {
+  PORTAL_ENTRY
+  PORTAL_COMMITMENT
+}
+
+// ─── Teams ───────────────────────────────────────────────────────────
+
+model Team {
+  id          Int       @id @default(autoincrement())
+  ncaaId      Int       @unique @map("ncaa_id")
+  name        String
+  mascot      String?
+  division    Division
+  conference  String
+  state       String?
+  logoUrl     String?   @map("logo_url")
+  seasonId    Int       @default(0) @map("season_id")
+  players     Player[]
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@index([division])
+  @@index([conference])
+  @@index([name])
+  @@map("teams")
+}
+
+// ─── Players ─────────────────────────────────────────────────────────
+
+model Player {
+  id              Int              @id @default(autoincrement())
+  ncaaId          Int?             @unique @map("ncaa_id")
+  firstName       String           @map("first_name")
+  lastName        String           @map("last_name")
+  position        String?          // Primary position: C, 1B, 2B, 3B, SS, LF, CF, RF, DH, P, UT
+  positions       String[]         @default([]) // All positions played
+  classYear       String?          @map("class_year") // Fr., So., Jr., Sr., Gr.
+  heightInches    Int?             @map("height_inches")
+  weightLbs       Int?             @map("weight_lbs")
+  bats            String?          // L, R, S
+  throws          String?          // L, R
+  hometown        String?
+  highSchool      String?          @map("high_school")
+  teamId          Int              @map("team_id")
+  team            Team             @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  inPortal        Boolean          @default(false) @map("in_portal")
+  portalDate      DateTime?        @map("portal_date")
+  committedTo     String?          @map("committed_to") // New team if committed
+  hittingStats    HittingStats?
+  pitchingStats   PitchingStats?
+  favorites       Favorite[]
+  portalAlerts    PortalAlert[]
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  @@index([lastName, firstName])
+  @@index([position])
+  @@index([inPortal])
+  @@index([teamId])
+  @@map("players")
+}
+
+// ─── Hitting Stats ───────────────────────────────────────────────────
+
+model HittingStats {
+  id        Int    @id @default(autoincrement())
+  playerId  Int    @unique @map("player_id")
+  player    Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  season    Int    @default(2026)
+
+  // Counting stats
+  g      Int @default(0) // Games
+  ab     Int @default(0) // At bats
+  r      Int @default(0) // Runs
+  h      Int @default(0) // Hits
+  doubles  Int @default(0) @map("2b")
+  triples  Int @default(0) @map("3b")
+  hr     Int @default(0) // Home runs
+  rbi    Int @default(0) // Runs batted in
+  bb     Int @default(0) // Walks
+  k      Int @default(0) // Strikeouts
+  sb     Int @default(0) // Stolen bases
+  cs     Int @default(0) // Caught stealing
+  hbp    Int @default(0) // Hit by pitch
+  sf     Int @default(0) // Sacrifice flies
+  sh     Int @default(0) // Sacrifice hits
+  gidp   Int @default(0) // Grounded into double play
+
+  // Calculated rates (stored server-side)
+  avg    Float? // Batting average
+  obp    Float? // On-base percentage
+  slg    Float? // Slugging percentage
+  ops    Float? // OPS
+
+  // Custom derived stats
+  xbh      Int?   // Extra base hits (2B + 3B + HR)
+  xbhToK   Float? @map("xbh_to_k") // XBH:K ratio
+  tb       Int?   // Total bases
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([season])
+  @@index([avg])
+  @@index([hr])
+  @@map("hitting_stats")
+}
+
+// ─── Pitching Stats ──────────────────────────────────────────────────
+
+model PitchingStats {
+  id        Int    @id @default(autoincrement())
+  playerId  Int    @unique @map("player_id")
+  player    Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  season    Int    @default(2026)
+
+  // Counting stats
+  app    Int   @default(0) // Appearances
+  gs     Int   @default(0) // Games started
+  w      Int   @default(0) // Wins
+  l      Int   @default(0) // Losses
+  sv     Int   @default(0) // Saves
+  cg     Int   @default(0) // Complete games
+  sho    Int   @default(0) // Shutouts
+  ip     Float @default(0) // Innings pitched
+  h      Int   @default(0) // Hits allowed
+  r      Int   @default(0) // Runs allowed
+  er     Int   @default(0) // Earned runs
+  bb     Int   @default(0) // Walks
+  k      Int   @default(0) // Strikeouts
+  hrAllowed Int @default(0) @map("hr_allowed")
+  hb     Int   @default(0) // Hit batters
+  wp     Int   @default(0) // Wild pitches
+  bk     Int   @default(0) // Balks
+
+  // Calculated rates
+  era    Float? // Earned run average
+  whip   Float? // WHIP
+
+  // Custom derived stats
+  kPer9  Float? @map("k_per_9")
+  bbPer9 Float? @map("bb_per_9")
+  kToBb  Float? @map("k_to_bb")
+  hPer9  Float? @map("h_per_9")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([season])
+  @@index([era])
+  @@index([k])
+  @@map("pitching_stats")
+}
+
+// ─── Users & Auth ────────────────────────────────────────────────────
+
+model User {
+  id              Int                @id @default(autoincrement())
+  email           String             @unique
+  passwordHash    String             @map("password_hash")
+  name            String?
+  emailVerified   Boolean            @default(false) @map("email_verified")
+  emailAlerts     Boolean            @default(true) @map("email_alerts")
+  favorites       Favorite[]
+  portalAlerts    PortalAlert[]
+  notifications   EmailNotification[]
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+// ─── Favorites ───────────────────────────────────────────────────────
+
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  playerId  Int      @map("player_id")
+  player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  alertSent Boolean  @default(false) @map("alert_sent")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, playerId])
+  @@index([userId])
+  @@index([playerId])
+  @@map("favorites")
+}
+
+// ─── Portal Alerts (dedup sent emails) ───────────────────────────────
+
+model PortalAlert {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  playerId  Int      @map("player_id")
+  player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  sentAt    DateTime @default(now()) @map("sent_at")
+
+  @@unique([userId, playerId])
+  @@index([playerId])
+  @@map("portal_alerts")
+}
+
+// ─── Email Notifications ─────────────────────────────────────────────
+
+model EmailNotification {
+  id        Int              @id @default(autoincrement())
+  userId    Int              @map("user_id")
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  playerId  Int              @map("player_id")
+  type      NotificationType
+  sentAt    DateTime         @default(now()) @map("sent_at")
+
+  @@index([userId])
+  @@index([playerId])
+  @@map("email_notifications")
+}
+
+// ─── Scrape Logs ─────────────────────────────────────────────────────
+
+model ScrapeLog {
+  id             Int          @id @default(autoincrement())
+  startedAt      DateTime     @default(now()) @map("started_at")
+  completedAt    DateTime?    @map("completed_at")
+  status         ScrapeStatus @default(RUNNING)
+  division       Division?
+  teamsScraped   Int          @default(0) @map("teams_scraped")
+  playersScraped Int          @default(0) @map("players_scraped")
+  errors         String[]     @default([])
+
+  @@map("scrape_logs")
+}

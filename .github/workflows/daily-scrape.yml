@@ -1,0 +1,102 @@
+name: Daily Stats Scrape
+
+on:
+  schedule:
+    # Run at 6 AM UTC every day (1 AM EST / 10 PM PST)
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      command:
+        description: 'Command to run (run, diagnostic, status)'
+        required: false
+        default: 'run'
+      force:
+        description: 'Force scrape even if season has not started (true/false)'
+        required: false
+        default: 'false'
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360  # 6 hour timeout
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r scraper/requirements.txt
+
+      - name: Check if season has started
+        id: season_check
+        run: |
+          python -c "
+          from datetime import datetime
+          start = datetime(2026, 2, 21)
+          if datetime.now() < start:
+              print('Season has not started yet (starts Feb 21, 2026)')
+              print('skip=true')
+          else:
+              print('Season is active')
+              print('skip=false')
+          " | tee /tmp/season_check.txt
+          if grep -q 'skip=true' /tmp/season_check.txt; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download previous progress
+        if: steps.season_check.outputs.skip != 'true' || github.event.inputs.force == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: scrape-progress
+          path: scraper/
+        continue-on-error: true
+
+      - name: Build schools database
+        if: steps.season_check.outputs.skip != 'true' || github.event.inputs.force == 'true'
+        run: |
+          cd scraper
+          python build_schools_db.py
+
+      - name: Run scraper
+        if: steps.season_check.outputs.skip != 'true' || github.event.inputs.force == 'true'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          cd scraper
+          CMD="${{ github.event.inputs.command || 'run' }}"
+          ARGS=""
+
+          if [ "${{ github.event.inputs.force }}" = "true" ]; then
+            ARGS="$ARGS --force"
+          fi
+
+          if [ "$CMD" = "diagnostic" ]; then
+            python main.py diagnostic
+          elif [ "$CMD" = "status" ]; then
+            python main.py status
+          else
+            python main.py run $ARGS
+          fi
+
+      - name: Upload progress
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scrape-progress
+          path: |
+            scraper/scrape_history.json
+            scraper/scraper.log
+          retention-days: 30
+
+      - name: Season not started notification
+        if: steps.season_check.outputs.skip == 'true' && github.event.inputs.force != 'true'
+        run: |
+          echo "::notice::2026 college baseball season hasn't started yet (starts Feb 21, 2026). Skipping scrape."
+          echo "To force a scrape anyway, use workflow_dispatch with force=true."

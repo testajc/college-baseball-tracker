@@ -1,0 +1,344 @@
+# scraper/main.py
+
+import argparse
+import logging
+import time
+import random
+import sys
+from datetime import datetime, date
+from pathlib import Path
+
+from config import INITIAL_SCRAPE_CONFIG, DAILY_UPDATE_CONFIG, ERROR_CONFIG, SEASON_START_DATE
+from scheduler import SmartScheduler
+from request_handler import ProtectedRequestHandler
+from parsers.sidearm_parser import SidearmParser
+from database import DatabaseManager
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[
+        logging.FileHandler(Path(__file__).parent / 'scraper.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+
+class CollegeBaseballScraper:
+    def __init__(self):
+        self.scheduler = SmartScheduler()
+        self.config = self.scheduler.get_scrape_config()
+        self.request_handler = ProtectedRequestHandler(self.config, ERROR_CONFIG)
+        self.parser = SidearmParser()
+        self.db = DatabaseManager()
+        self.schools_scraped_today = 0
+        self.total_players_scraped = 0
+
+    def should_scrape(self, force: bool = False) -> bool:
+        """Check if season has started"""
+        if force:
+            logger.warning("Force flag set - scraping even though season may not have started")
+            return True
+
+        season_start = datetime.strptime(SEASON_START_DATE, '%Y-%m-%d').date()
+        today = date.today()
+
+        if today < season_start:
+            days_until = (season_start - today).days
+            logger.warning(f"2026 season hasn't started yet!")
+            logger.warning(f"Season starts: {season_start.strftime('%B %d, %Y')}")
+            logger.warning(f"Days until season: {days_until}")
+            logger.warning("Use --force to scrape anyway (will get old/no data)")
+            return False
+
+        return True
+
+    def scrape_school(self, school: dict) -> dict:
+        """Scrape a single school"""
+        school_name = school['school_name']
+        base_url = school.get('athletics_base_url', '').rstrip('/')
+
+        logger.info(f"Scraping: {school_name} ({school.get('division', '?')})")
+
+        result = {
+            'school': school_name,
+            'division': school.get('division', ''),
+            'conference': school.get('conference', ''),
+            'players': [],
+            'success': False,
+            'errors': []
+        }
+
+        if not base_url:
+            result['errors'].append(f"No athletics URL for {school_name}")
+            return result
+
+        # URL patterns to try for roster and stats
+        # Many SIDEARM sites use different path conventions
+        ROSTER_PATHS = [
+            school.get('roster_url', '/sports/baseball/roster'),
+            '/sports/baseball/roster',
+            '/sports/bsb/2025-26/roster',
+            '/sports/bsb/roster',
+            '/sports/mens-baseball/roster',
+        ]
+        STATS_PATHS = [
+            school.get('stats_url', '/sports/baseball/stats'),
+            '/sports/baseball/stats',
+            '/sports/bsb/2025-26/stats',
+            '/sports/bsb/stats',
+            '/sports/mens-baseball/stats',
+        ]
+        # Deduplicate while preserving order
+        ROSTER_PATHS = list(dict.fromkeys(ROSTER_PATHS))
+        STATS_PATHS = list(dict.fromkeys(STATS_PATHS))
+
+        # Try roster URL patterns
+        response = None
+        roster_url = None
+        for path in ROSTER_PATHS:
+            url = f"{base_url}{path}" if not path.startswith('http') else path
+            logger.debug(f"Trying roster: {url}")
+            resp = self.request_handler.get(url)
+            if resp:
+                response = resp
+                roster_url = url
+                break
+
+        if not response:
+            result['errors'].append(f"Failed to fetch roster from {base_url} (tried {len(ROSTER_PATHS)} paths)")
+            return result
+
+        roster = self.parser.parse_roster(response.text, school_name)
+        logger.info(f"  Found {len(roster)} players on roster")
+
+        if not roster:
+            result['errors'].append("No players parsed from roster page")
+
+        # Wait before stats request
+        time.sleep(random.uniform(*self.config['between_pages_same_school']))
+
+        # Try stats URL patterns
+        stats_response = None
+        for path in STATS_PATHS:
+            url = f"{base_url}{path}" if not path.startswith('http') else path
+            logger.debug(f"Trying stats: {url}")
+            resp = self.request_handler.get(
+                url,
+                delay_type='between_pages_same_school',
+                referer=roster_url
+            )
+            if resp:
+                stats_response = resp
+                break
+
+        batting_stats = {}
+        pitching_stats = {}
+        response = stats_response
+
+        if response:
+            batting_stats = self.parser.parse_batting_stats(response.text)
+            pitching_stats = self.parser.parse_pitching_stats(response.text)
+            logger.info(f"  Batting stats: {len(batting_stats)} players")
+            logger.info(f"  Pitching stats: {len(pitching_stats)} players")
+        else:
+            result['errors'].append(f"Failed to fetch stats from {base_url} (tried {len(STATS_PATHS)} paths)")
+
+        # Merge data
+        for player in roster:
+            player_name = player.get('name', '')
+            player['batting_stats'] = batting_stats.get(player_name)
+            player['pitching_stats'] = pitching_stats.get(player_name)
+            result['players'].append(player)
+
+        # Add any players in stats but not roster
+        roster_names = {p.get('name') for p in roster}
+        for name, stats in batting_stats.items():
+            if name not in roster_names:
+                result['players'].append({
+                    'name': name,
+                    'school': school_name,
+                    'batting_stats': stats,
+                    'pitching_stats': pitching_stats.get(name)
+                })
+
+        result['success'] = len(result['players']) > 0
+
+        if result['success']:
+            logger.info(f"  Success: {len(result['players'])} total players")
+        else:
+            logger.warning(f"  Failed: No players found")
+
+        return result
+
+    def run(self, force: bool = False, dry_run: bool = False):
+        """Main run method - handles both initial and daily scraping"""
+        if not self.should_scrape(force):
+            return
+
+        # Get schools to scrape today
+        schools = self.scheduler.get_schools_to_scrape_today()
+
+        if not schools:
+            logger.info("No schools need scraping today")
+            return
+
+        # Print status
+        print(self.scheduler.get_status_report())
+
+        logger.info(f"Schools to scrape today: {len(schools)}")
+
+        if dry_run:
+            logger.info("DRY RUN - would scrape these schools:")
+            for s in schools[:20]:
+                logger.info(f"  {s['school_name']} ({s.get('division', '?')})")
+            if len(schools) > 20:
+                logger.info(f"  ... and {len(schools) - 20} more")
+            return
+
+        max_schools = self.config.get('max_schools_per_day', 100)
+        log_id = self.db.log_scrape_start()
+        errors = []
+
+        try:
+            for i, school in enumerate(schools):
+                if self.schools_scraped_today >= max_schools:
+                    logger.info(f"Daily limit reached ({max_schools} schools)")
+                    break
+
+                try:
+                    result = self.scrape_school(school)
+
+                    if result['success']:
+                        players_saved = self.db.save_school_data(result)
+                        self.scheduler.mark_scraped(school['school_name'])
+                        self.schools_scraped_today += 1
+                        self.total_players_scraped += players_saved
+
+                    if result['errors']:
+                        errors.extend(result['errors'])
+
+                    # Progress update
+                    if (i + 1) % 10 == 0:
+                        logger.info(f"Progress: {i + 1}/{len(schools)} schools processed "
+                                    f"({self.schools_scraped_today} successful, "
+                                    f"{self.total_players_scraped} players)")
+
+                    # Wait between schools
+                    if i < len(schools) - 1:
+                        delay = random.uniform(*self.config['between_schools'])
+                        time.sleep(delay)
+
+                except KeyboardInterrupt:
+                    logger.warning("Interrupted by user")
+                    break
+                except Exception as e:
+                    logger.error(f"Error scraping {school['school_name']}: {e}")
+                    errors.append(f"{school['school_name']}: {str(e)}")
+                    continue
+
+        finally:
+            self.db.log_scrape_end(
+                log_id,
+                self.schools_scraped_today,
+                self.total_players_scraped,
+                errors[:50],  # Cap errors stored
+                success=self.schools_scraped_today > 0
+            )
+            self.db.close()
+
+        logger.info(f"Scrape session complete. "
+                    f"Schools: {self.schools_scraped_today}, "
+                    f"Players: {self.total_players_scraped}")
+
+    def run_diagnostic(self):
+        """Test on 3 schools"""
+        test_schools = [
+            {
+                'school_name': 'Vanderbilt',
+                'division': 'D1',
+                'conference': 'SEC',
+                'athletics_base_url': 'https://vucommodores.com',
+                'roster_url': '/sports/baseball/roster',
+                'stats_url': '/sports/baseball/stats'
+            },
+            {
+                'school_name': 'Tampa',
+                'division': 'D2',
+                'conference': 'SSC',
+                'athletics_base_url': 'https://tampaspartans.com',
+                'roster_url': '/sports/baseball/roster',
+                'stats_url': '/sports/baseball/stats'
+            },
+            {
+                'school_name': 'Chapman',
+                'division': 'D3',
+                'conference': 'SCIAC',
+                'athletics_base_url': 'https://chapmanathletics.com',
+                'roster_url': '/sports/baseball/roster',
+                'stats_url': '/sports/baseball/stats'
+            },
+        ]
+
+        print("\n" + "=" * 60)
+        print("DIAGNOSTIC MODE - Testing 3 Schools")
+        print("=" * 60)
+
+        for school in test_schools:
+            result = self.scrape_school(school)
+
+            print(f"\n--- {school['school_name']} ({school['division']}) ---")
+            print(f"Success: {result['success']}")
+            print(f"Players: {len(result['players'])}")
+
+            if result['errors']:
+                print(f"Errors: {result['errors']}")
+
+            if result['players'][:3]:
+                print("Sample players:")
+                for p in result['players'][:3]:
+                    print(f"  - {p.get('name')} - {p.get('position', 'N/A')} "
+                          f"({p.get('class_year', 'N/A')})")
+                    if p.get('batting_stats'):
+                        bs = p['batting_stats']
+                        print(f"    Batting: {bs.get('batting_average', 'N/A')} AVG, "
+                              f"{bs.get('home_runs', 0)} HR, "
+                              f"XBH:K={bs.get('xbh_to_k', 'N/A')}")
+                    if p.get('pitching_stats'):
+                        ps = p['pitching_stats']
+                        print(f"    Pitching: {ps.get('era', 'N/A')} ERA, "
+                              f"K/9={ps.get('k_per_9', 'N/A')}, "
+                              f"BB/9={ps.get('bb_per_9', 'N/A')}")
+
+            # Wait between test schools
+            time.sleep(15)
+
+        print("\n" + "=" * 60)
+        print("DIAGNOSTIC COMPLETE")
+        print("=" * 60)
+
+
+def main():
+    parser = argparse.ArgumentParser(description='College Baseball Stats Scraper')
+    parser.add_argument('command', choices=['run', 'diagnostic', 'status'],
+                        help='run=daily scrape, diagnostic=test 3 schools, status=show progress')
+    parser.add_argument('--force', '-f', action='store_true',
+                        help='Force scrape even if season has not started')
+    parser.add_argument('--dry-run', action='store_true',
+                        help='Show what would be scraped without actually scraping')
+
+    args = parser.parse_args()
+
+    scraper = CollegeBaseballScraper()
+
+    if args.command == 'run':
+        scraper.run(force=args.force, dry_run=args.dry_run)
+    elif args.command == 'diagnostic':
+        scraper.run_diagnostic()
+    elif args.command == 'status':
+        print(scraper.scheduler.get_status_report())
+
+
+if __name__ == '__main__':
+    main()
