@@ -331,6 +331,19 @@ export function FilterPanel({ filters, conferences, onFilterChange }: FilterPane
               className="h-8 text-sm"
             />
           </div>
+
+          <div>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">Min IP</label>
+            <Input
+              type="number"
+              step="0.1"
+              min="0"
+              placeholder="50"
+              value={filters.minIP ?? ""}
+              onChange={(e) => update({ minIP: e.target.value ? parseFloat(e.target.value) : undefined })}
+              className="h-8 text-sm"
+            />
+          </div>
         </>
       )}
 

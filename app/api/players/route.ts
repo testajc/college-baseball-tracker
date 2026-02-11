@@ -43,6 +43,7 @@ export async function GET(req: NextRequest) {
   const minKToBb = params.get("minKToBb") ? parseFloat(params.get("minKToBb")!) : undefined;
   const minWins = params.get("minWins") ? parseInt(params.get("minWins")!) : undefined;
   const minSaves = params.get("minSaves") ? parseInt(params.get("minSaves")!) : undefined;
+  const minIP = params.get("minIP") ? parseFloat(params.get("minIP")!) : undefined;
 
   try {
     const where: Prisma.PlayerWhereInput = {};
@@ -79,7 +80,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Pitching stat threshold filters
-    const hasPitchingFilters = [maxEra, maxWhip, minKPer9, maxBB9, minKToBb, minWins, minSaves].some(v => v !== undefined);
+    const hasPitchingFilters = [maxEra, maxWhip, minKPer9, maxBB9, minKToBb, minWins, minSaves, minIP].some(v => v !== undefined);
     if (hasPitchingFilters) {
       where.pitchingStats = {
         ...where.pitchingStats as object,
@@ -90,6 +91,7 @@ export async function GET(req: NextRequest) {
         ...(minKToBb !== undefined && { kToBb: { gte: minKToBb } }),
         ...(minWins !== undefined && { w: { gte: minWins } }),
         ...(minSaves !== undefined && { sv: { gte: minSaves } }),
+        ...(minIP !== undefined && { ip: { gte: minIP } }),
       };
     }
 

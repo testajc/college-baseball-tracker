@@ -117,4 +117,5 @@ export interface PlayerFilters {
   minKToBb?: number;
   minWins?: number;
   minSaves?: number;
+  minIP?: number;
 }

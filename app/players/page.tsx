@@ -67,6 +67,7 @@ export default function PlayersPage() {
     if (filters.minKToBb) params.set("minKToBb", String(filters.minKToBb));
     if (filters.minWins) params.set("minWins", String(filters.minWins));
     if (filters.minSaves) params.set("minSaves", String(filters.minSaves));
+    if (filters.minIP) params.set("minIP", String(filters.minIP));
 
     try {
       const res = await fetch(`/api/players?${params}`);
