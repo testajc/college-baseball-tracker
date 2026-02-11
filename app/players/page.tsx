@@ -46,16 +46,27 @@ export default function PlayersPage() {
     if (filters.division) params.set("division", filters.division);
     if (filters.position) params.set("position", filters.position);
     if (filters.conference) params.set("conference", filters.conference);
+    if (filters.classYear) params.set("classYear", filters.classYear);
     if (filters.teamId) params.set("teamId", String(filters.teamId));
     if (filters.inPortal) params.set("inPortal", "true");
     if (filters.statType) params.set("statType", filters.statType);
+    // Hitting stat filters
     if (filters.minAvg) params.set("minAvg", String(filters.minAvg));
+    if (filters.minObp) params.set("minObp", String(filters.minObp));
+    if (filters.minSlg) params.set("minSlg", String(filters.minSlg));
     if (filters.minOps) params.set("minOps", String(filters.minOps));
     if (filters.minHR) params.set("minHR", String(filters.minHR));
+    if (filters.minRBI) params.set("minRBI", String(filters.minRBI));
+    if (filters.minSB) params.set("minSB", String(filters.minSB));
     if (filters.minXbhToK) params.set("minXbhToK", String(filters.minXbhToK));
+    // Pitching stat filters
     if (filters.maxEra) params.set("maxEra", String(filters.maxEra));
+    if (filters.maxWhip) params.set("maxWhip", String(filters.maxWhip));
     if (filters.minKPer9) params.set("minKPer9", String(filters.minKPer9));
     if (filters.maxBB9) params.set("maxBB9", String(filters.maxBB9));
+    if (filters.minKToBb) params.set("minKToBb", String(filters.minKToBb));
+    if (filters.minWins) params.set("minWins", String(filters.minWins));
+    if (filters.minSaves) params.set("minSaves", String(filters.minSaves));
 
     try {
       const res = await fetch(`/api/players?${params}`);

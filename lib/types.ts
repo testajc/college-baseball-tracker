@@ -96,14 +96,25 @@ export interface PlayerFilters {
   division?: Division;
   position?: string;
   conference?: string;
+  classYear?: string;
   teamId?: number;
   inPortal?: boolean;
   statType?: "hitting" | "pitching";
+  // Hitting stats
   minAvg?: number;
-  maxEra?: number;
-  minKPer9?: number;
+  minObp?: number;
+  minSlg?: number;
   minOps?: number;
   minHR?: number;
-  maxBB9?: number;
+  minRBI?: number;
+  minSB?: number;
   minXbhToK?: number;
+  // Pitching stats
+  maxEra?: number;
+  maxWhip?: number;
+  minKPer9?: number;
+  maxBB9?: number;
+  minKToBb?: number;
+  minWins?: number;
+  minSaves?: number;
 }

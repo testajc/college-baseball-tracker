@@ -18,20 +18,31 @@ export async function GET(req: NextRequest) {
     : undefined;
   const position = params.get("position");
   const conference = params.get("conference");
+  const classYear = params.get("classYear");
   const teamId = params.get("teamId") ? parseInt(params.get("teamId")!) : undefined;
   const inPortal = params.get("inPortal") === "true" ? true : undefined;
   const statType = params.get("statType") as "hitting" | "pitching" | null;
   const sortBy = params.get("sortBy") || "lastName";
   const sortDir = params.get("sortDir") === "desc" ? "desc" : "asc";
 
-  // Stat thresholds
+  // Hitting stat thresholds
   const minAvg = params.get("minAvg") ? parseFloat(params.get("minAvg")!) : undefined;
-  const maxEra = params.get("maxEra") ? parseFloat(params.get("maxEra")!) : undefined;
-  const minKPer9 = params.get("minKPer9") ? parseFloat(params.get("minKPer9")!) : undefined;
+  const minObp = params.get("minObp") ? parseFloat(params.get("minObp")!) : undefined;
+  const minSlg = params.get("minSlg") ? parseFloat(params.get("minSlg")!) : undefined;
   const minOps = params.get("minOps") ? parseFloat(params.get("minOps")!) : undefined;
   const minHR = params.get("minHR") ? parseInt(params.get("minHR")!) : undefined;
-  const maxBB9 = params.get("maxBB9") ? parseFloat(params.get("maxBB9")!) : undefined;
+  const minRBI = params.get("minRBI") ? parseInt(params.get("minRBI")!) : undefined;
+  const minSB = params.get("minSB") ? parseInt(params.get("minSB")!) : undefined;
   const minXbhToK = params.get("minXbhToK") ? parseFloat(params.get("minXbhToK")!) : undefined;
+
+  // Pitching stat thresholds
+  const maxEra = params.get("maxEra") ? parseFloat(params.get("maxEra")!) : undefined;
+  const maxWhip = params.get("maxWhip") ? parseFloat(params.get("maxWhip")!) : undefined;
+  const minKPer9 = params.get("minKPer9") ? parseFloat(params.get("minKPer9")!) : undefined;
+  const maxBB9 = params.get("maxBB9") ? parseFloat(params.get("maxBB9")!) : undefined;
+  const minKToBb = params.get("minKToBb") ? parseFloat(params.get("minKToBb")!) : undefined;
+  const minWins = params.get("minWins") ? parseInt(params.get("minWins")!) : undefined;
+  const minSaves = params.get("minSaves") ? parseInt(params.get("minSaves")!) : undefined;
 
   try {
     const where: Prisma.PlayerWhereInput = {};
@@ -48,25 +59,37 @@ export async function GET(req: NextRequest) {
     if (conference) where.team = { ...where.team as object, conference };
     if (teamId) where.teamId = teamId;
     if (position) where.position = position;
+    if (classYear) where.classYear = classYear;
     if (inPortal !== undefined) where.inPortal = inPortal;
 
-    // Stat threshold filters
-    if (minAvg !== undefined || minOps !== undefined || minHR !== undefined || minXbhToK !== undefined) {
+    // Hitting stat threshold filters
+    const hasHittingFilters = [minAvg, minObp, minSlg, minOps, minHR, minRBI, minSB, minXbhToK].some(v => v !== undefined);
+    if (hasHittingFilters) {
       where.hittingStats = {
         ...where.hittingStats as object,
         ...(minAvg !== undefined && { avg: { gte: minAvg } }),
+        ...(minObp !== undefined && { obp: { gte: minObp } }),
+        ...(minSlg !== undefined && { slg: { gte: minSlg } }),
         ...(minOps !== undefined && { ops: { gte: minOps } }),
         ...(minHR !== undefined && { hr: { gte: minHR } }),
+        ...(minRBI !== undefined && { rbi: { gte: minRBI } }),
+        ...(minSB !== undefined && { sb: { gte: minSB } }),
         ...(minXbhToK !== undefined && { xbhToK: { gte: minXbhToK } }),
       };
     }
 
-    if (maxEra !== undefined || minKPer9 !== undefined || maxBB9 !== undefined) {
+    // Pitching stat threshold filters
+    const hasPitchingFilters = [maxEra, maxWhip, minKPer9, maxBB9, minKToBb, minWins, minSaves].some(v => v !== undefined);
+    if (hasPitchingFilters) {
       where.pitchingStats = {
         ...where.pitchingStats as object,
         ...(maxEra !== undefined && { era: { lte: maxEra } }),
+        ...(maxWhip !== undefined && { whip: { lte: maxWhip } }),
         ...(minKPer9 !== undefined && { kPer9: { gte: minKPer9 } }),
         ...(maxBB9 !== undefined && { bbPer9: { lte: maxBB9 } }),
+        ...(minKToBb !== undefined && { kToBb: { gte: minKToBb } }),
+        ...(minWins !== undefined && { w: { gte: minWins } }),
+        ...(minSaves !== undefined && { sv: { gte: minSaves } }),
       };
     }
 
