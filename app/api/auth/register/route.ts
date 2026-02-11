@@ -14,6 +14,19 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { email, password, name } = registerSchema.parse(body);
 
+    // Check if email is in the allowlist
+    const allowedEmails = (process.env.ALLOWED_EMAILS || "")
+      .split(",")
+      .map((e) => e.trim().toLowerCase())
+      .filter((e) => e.length > 0);
+
+    if (allowedEmails.length > 0 && !allowedEmails.includes(email.toLowerCase())) {
+      return NextResponse.json(
+        { error: "Email not authorized for registration" },
+        { status: 403 }
+      );
+    }
+
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
       return NextResponse.json(
