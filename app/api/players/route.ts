@@ -34,6 +34,7 @@ export async function GET(req: NextRequest) {
   const minRBI = params.get("minRBI") ? parseInt(params.get("minRBI")!) : undefined;
   const minSB = params.get("minSB") ? parseInt(params.get("minSB")!) : undefined;
   const minXbhToK = params.get("minXbhToK") ? parseFloat(params.get("minXbhToK")!) : undefined;
+  const minAB = params.get("minAB") ? parseInt(params.get("minAB")!) : undefined;
 
   // Pitching stat thresholds
   const maxEra = params.get("maxEra") ? parseFloat(params.get("maxEra")!) : undefined;
@@ -64,7 +65,7 @@ export async function GET(req: NextRequest) {
     if (inPortal !== undefined) where.inPortal = inPortal;
 
     // Hitting stat threshold filters
-    const hasHittingFilters = [minAvg, minObp, minSlg, minOps, minHR, minRBI, minSB, minXbhToK].some(v => v !== undefined);
+    const hasHittingFilters = [minAvg, minObp, minSlg, minOps, minHR, minRBI, minSB, minXbhToK, minAB].some(v => v !== undefined);
     if (hasHittingFilters) {
       where.hittingStats = {
         ...where.hittingStats as object,
@@ -76,6 +77,7 @@ export async function GET(req: NextRequest) {
         ...(minRBI !== undefined && { rbi: { gte: minRBI } }),
         ...(minSB !== undefined && { sb: { gte: minSB } }),
         ...(minXbhToK !== undefined && { xbhToK: { gte: minXbhToK } }),
+        ...(minAB !== undefined && { ab: { gte: minAB } }),
       };
     }
 

@@ -109,6 +109,7 @@ export interface PlayerFilters {
   minRBI?: number;
   minSB?: number;
   minXbhToK?: number;
+  minAB?: number;
   // Pitching stats
   maxEra?: number;
   maxWhip?: number;

@@ -231,6 +231,19 @@ export function FilterPanel({ filters, conferences, onFilterChange }: FilterPane
               className="h-8 text-sm"
             />
           </div>
+
+          <div>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">Min AB</label>
+            <Input
+              type="number"
+              step="1"
+              min="0"
+              placeholder="100"
+              value={filters.minAB ?? ""}
+              onChange={(e) => update({ minAB: e.target.value ? parseInt(e.target.value) : undefined })}
+              className="h-8 text-sm"
+            />
+          </div>
         </>
       )}
 

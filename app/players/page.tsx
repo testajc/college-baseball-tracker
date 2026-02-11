@@ -59,6 +59,7 @@ export default function PlayersPage() {
     if (filters.minRBI) params.set("minRBI", String(filters.minRBI));
     if (filters.minSB) params.set("minSB", String(filters.minSB));
     if (filters.minXbhToK) params.set("minXbhToK", String(filters.minXbhToK));
+    if (filters.minAB) params.set("minAB", String(filters.minAB));
     // Pitching stat filters
     if (filters.maxEra) params.set("maxEra", String(filters.maxEra));
     if (filters.maxWhip) params.set("maxWhip", String(filters.maxWhip));
