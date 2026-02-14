@@ -271,6 +271,20 @@ class SidearmParser:
                     stats_table = heading.find_next('table')
                     break
 
+        # Fallback: find table with batting-like column headers (SIDEARM v3)
+        if not stats_table:
+            for table in soup.find_all('table'):
+                thead = table.find('thead')
+                if not thead:
+                    continue
+                headers = {th.get_text(strip=True).lower().replace('.', '').replace('%', '')
+                           for th in thead.find_all(['th', 'td'])}
+                batting_indicators = {'avg', 'ab', 'rbi', 'slg', 'obp', 'ops'}
+                if len(headers & batting_indicators) >= 3:
+                    stats_table = table
+                    logger.debug("Found batting table via column header detection")
+                    break
+
         if not stats_table:
             logger.debug("No batting stats table found")
             return stats
@@ -301,6 +315,20 @@ class SidearmParser:
                     stats_table = heading.find_next('table')
                     break
 
+        # Fallback: find table with pitching-like column headers
+        if not stats_table:
+            for table in soup.find_all('table'):
+                thead = table.find('thead')
+                if not thead:
+                    continue
+                headers = {th.get_text(strip=True).lower().replace('.', '').replace('%', '')
+                           for th in thead.find_all(['th', 'td'])}
+                pitching_indicators = {'era', 'ip', 'whip', 'sv', 'gs'}
+                if len(headers & pitching_indicators) >= 3:
+                    stats_table = table
+                    logger.debug("Found pitching table via column header detection")
+                    break
+
         if not stats_table:
             logger.debug("No pitching stats table found")
             return stats
@@ -313,7 +341,7 @@ class SidearmParser:
         stats = {}
 
         BATTING_COLS = {
-            'g': 'games', 'gp': 'games',
+            'g': 'games', 'gp': 'games', 'gp-gs': 'games',
             'ab': 'at_bats',
             'r': 'runs',
             'h': 'hits',
@@ -323,11 +351,11 @@ class SidearmParser:
             'rbi': 'rbi',
             'bb': 'walks',
             'so': 'strikeouts', 'k': 'strikeouts',
-            'sb': 'stolen_bases',
+            'sb': 'stolen_bases', 'sb-att': 'stolen_bases',
             'cs': 'caught_stealing',
             'avg': 'batting_average', 'ba': 'batting_average',
-            'obp': 'on_base_percentage',
-            'slg': 'slugging_percentage',
+            'obp': 'on_base_percentage', 'ob': 'on_base_percentage',
+            'slg': 'slugging_percentage', 'slg%': 'slugging_percentage',
             'ops': 'ops',
             'hbp': 'hit_by_pitch',
             'sf': 'sacrifice_flies',
@@ -404,7 +432,12 @@ class SidearmParser:
 
                 # Player name
                 if i == name_idx or header in ['name', 'player', 'athlete']:
-                    player_name = value
+                    # Normalize "Last, First" to "First Last"
+                    if ',' in value:
+                        parts = value.split(',', 1)
+                        player_name = f"{parts[1].strip()} {parts[0].strip()}"
+                    else:
+                        player_name = value
                     continue
 
                 # Skip jersey number
@@ -435,6 +468,10 @@ class SidearmParser:
             return None
 
         value = value.strip()
+
+        # Handle "X - Y" format (GP-GS, SB-ATT) - take first number
+        if ' - ' in value:
+            value = value.split(' - ')[0].strip()
 
         try:
             if stat_key == 'innings_pitched':

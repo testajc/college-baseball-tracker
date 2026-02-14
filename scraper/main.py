@@ -78,6 +78,8 @@ class CollegeBaseballScraper:
         # Many SIDEARM sites use different path conventions
         ROSTER_PATHS = [
             school.get('roster_url', '/sports/baseball/roster'),
+            '/sports/baseball/roster/2026',
+            '/sports/baseball/roster/2025-26',
             '/sports/baseball/roster',
             '/sports/bsb/2025-26/roster',
             '/sports/bsb/roster',
@@ -85,6 +87,8 @@ class CollegeBaseballScraper:
         ]
         STATS_PATHS = [
             school.get('stats_url', '/sports/baseball/stats'),
+            '/sports/baseball/stats/2026',
+            '/sports/baseball/stats/2025-26',
             '/sports/baseball/stats',
             '/sports/bsb/2025-26/stats',
             '/sports/bsb/stats',
@@ -130,6 +134,12 @@ class CollegeBaseballScraper:
                 referer=roster_url
             )
             if resp:
+                # Skip if redirected to homepage (common on SIDEARM v3 for bad paths)
+                final_url = resp.url.rstrip('/')
+                base_clean = base_url.rstrip('/')
+                if final_url == base_clean or final_url == base_clean + '/':
+                    logger.debug(f"  Redirected to homepage, skipping: {url}")
+                    continue
                 stats_response = resp
                 break
 
@@ -256,10 +266,10 @@ class CollegeBaseballScraper:
         """Test on 3 schools"""
         test_schools = [
             {
-                'school_name': 'Vanderbilt',
+                'school_name': 'Louisville',
                 'division': 'D1',
-                'conference': 'SEC',
-                'athletics_base_url': 'https://vucommodores.com',
+                'conference': 'ACC',
+                'athletics_base_url': 'https://gocards.com',
                 'roster_url': '/sports/baseball/roster',
                 'stats_url': '/sports/baseball/stats'
             },
