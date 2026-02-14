@@ -1,8 +1,9 @@
 # scraper/parsers/sidearm_parser.py
 
 from bs4 import BeautifulSoup
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Tuple
 import re
+import json
 import logging
 
 logger = logging.getLogger(__name__)
@@ -245,6 +246,181 @@ class SidearmParser:
                 players.append(player)
 
         return players
+
+    # ── Nuxt payload parser (SIDEARM v3) ─────────────────────────────
+
+    def _resolve_nuxt_payload(self, payload: list, idx: int, depth: int = 0):
+        """Recursively resolve Nuxt devalue references."""
+        if depth > 20 or not isinstance(idx, int) or idx < 0 or idx >= len(payload):
+            return idx
+        val = payload[idx]
+        if isinstance(val, list) and len(val) == 2 and isinstance(val[0], str) \
+                and val[0] in ("ShallowReactive", "Reactive", "ShallowRef", "Ref"):
+            return self._resolve_nuxt_payload(payload, val[1], depth + 1)
+        if isinstance(val, dict):
+            return {k: self._resolve_nuxt_payload(payload, v, depth + 1) for k, v in val.items()}
+        if isinstance(val, list):
+            return [self._resolve_nuxt_payload(payload, item, depth + 1) for item in val]
+        return val
+
+    def parse_nuxt_stats(self, html: str) -> Tuple[Dict[str, Dict], Dict[str, Dict]]:
+        """
+        Extract batting and pitching stats from a SIDEARM v3 Nuxt payload.
+        Returns (batting_stats, pitching_stats) dicts keyed by player name.
+        Returns ({}, {}) if no Nuxt payload found.
+        """
+        batting = {}
+        pitching = {}
+
+        # Find the devalue payload script
+        scripts = re.findall(r'<script[^>]*>(.*?)</script>', html, re.DOTALL)
+        payload = None
+        for s in scripts:
+            s = s.strip()
+            if s.startswith('[["ShallowReactive"') or s.startswith('[["Reactive"'):
+                try:
+                    payload = json.loads(s)
+                    break
+                except json.JSONDecodeError:
+                    continue
+
+        if not payload:
+            return batting, pitching
+
+        # Navigate: root → pinia → statsSeason → cumulativeStats → first season → overallIndividualStats
+        try:
+            root = payload[1]  # root state object
+            pinia_idx = root.get('pinia')
+            if pinia_idx is None:
+                return batting, pitching
+            pinia = payload[pinia_idx]
+            if isinstance(pinia, list):
+                pinia = payload[pinia[1]] if len(pinia) == 2 else {}
+
+            stats_season_idx = pinia.get('statsSeason')
+            if stats_season_idx is None:
+                return batting, pitching
+            stats_season = self._resolve_nuxt_payload(payload, stats_season_idx)
+
+            cume = stats_season.get('cumulativeStats', {})
+            if not cume:
+                return batting, pitching
+
+            # Get first (usually only) season entry
+            first_season_key = next(iter(cume))
+            season_data = cume[first_season_key]
+
+            individual = season_data.get('overallIndividualStats', {})
+            ind_stats = individual.get('individualStats', {})
+
+            hitting_list = ind_stats.get('individualHittingStats', [])
+            pitching_list = ind_stats.get('individualPitchingStats', [])
+
+        except (IndexError, KeyError, TypeError, StopIteration) as e:
+            logger.debug(f"Nuxt payload navigation failed: {e}")
+            return batting, pitching
+
+        # Map hitting stats
+        HITTING_MAP = {
+            'atBats': 'at_bats', 'runs': 'runs', 'hits': 'hits',
+            'doubles': 'doubles', 'triples': 'triples', 'homeRuns': 'home_runs',
+            'runsBattedIn': 'rbi', 'walks': 'walks', 'strikeouts': 'strikeouts',
+            'stolenBases': 'stolen_bases', 'caughtStealing': 'caught_stealing',
+            'hitByPitch': 'hit_by_pitch', 'sacrificeFlies': 'sacrifice_flies',
+            'sacrificeHits': 'sacrifice_hits', 'totalBases': 'total_bases',
+            'gamesPlayed': 'games', 'groundedIntoDoublePlay': 'grounded_into_dp',
+        }
+        HITTING_FLOAT_MAP = {
+            'battingAverage': 'batting_average', 'onBasePercentage': 'on_base_percentage',
+            'sluggingPercentage': 'slugging_percentage', 'ops': 'ops',
+        }
+
+        for p in hitting_list:
+            if p.get('isAFooterStat'):
+                continue
+            name = p.get('playerName', '')
+            if not name:
+                continue
+            # Normalize "Last, First" to "First Last"
+            if ',' in name:
+                parts = name.split(',', 1)
+                name = f"{parts[1].strip()} {parts[0].strip()}"
+
+            stats = {}
+            for src, dst in HITTING_MAP.items():
+                val = p.get(src)
+                if val is not None:
+                    try:
+                        stats[dst] = int(float(val))
+                    except (ValueError, TypeError):
+                        pass
+            for src, dst in HITTING_FLOAT_MAP.items():
+                val = p.get(src)
+                if val is not None:
+                    try:
+                        stats[dst] = float(val)
+                    except (ValueError, TypeError):
+                        pass
+
+            if stats:
+                stats = self._calc_batting_derived(stats)
+                batting[name] = stats
+
+        # Map pitching stats
+        PITCHING_MAP = {
+            'appearances': 'appearances', 'gamesStarted': 'games_started',
+            'wins': 'wins', 'losses': 'losses', 'saves': 'saves',
+            'combinedShutouts': 'shutouts', 'hitsAllowed': 'hits_allowed',
+            'runsAllowed': 'runs_allowed', 'earnedRunsAllowed': 'earned_runs',
+            'walksAllowed': 'walks', 'strikeouts': 'strikeouts',
+            'homeRunsAllowed': 'home_runs_allowed', 'hitBatters': 'hit_batters',
+            'wildPitches': 'wild_pitches', 'balks': 'balks',
+        }
+        PITCHING_FLOAT_MAP = {
+            'earnedRunAverage': 'era', 'whip': 'whip',
+        }
+
+        for p in pitching_list:
+            if p.get('isAFooterStat'):
+                continue
+            name = p.get('playerName', '')
+            if not name:
+                continue
+            if ',' in name:
+                parts = name.split(',', 1)
+                name = f"{parts[1].strip()} {parts[0].strip()}"
+
+            stats = {}
+            for src, dst in PITCHING_MAP.items():
+                val = p.get(src)
+                if val is not None:
+                    try:
+                        stats[dst] = int(float(val))
+                    except (ValueError, TypeError):
+                        pass
+            for src, dst in PITCHING_FLOAT_MAP.items():
+                val = p.get(src)
+                if val is not None:
+                    try:
+                        stats[dst] = float(val)
+                    except (ValueError, TypeError):
+                        pass
+
+            # Innings pitched needs special handling (string like "4.1")
+            ip_val = p.get('inningsPitched')
+            if ip_val is not None:
+                stats['innings_pitched'] = self._parse_stat_value(str(ip_val), 'innings_pitched')
+
+            if stats:
+                stats = self._calc_pitching_derived(stats)
+                pitching[name] = stats
+
+        if batting or pitching:
+            logger.info(f"  Nuxt payload: {len(batting)} batting, {len(pitching)} pitching")
+
+        return batting, pitching
+
+    # ── HTML table parsers ───────────────────────────────────────────
 
     def parse_batting_stats(self, html: str) -> Dict[str, Dict]:
         """Parse batting statistics page"""

@@ -148,8 +148,15 @@ class CollegeBaseballScraper:
         response = stats_response
 
         if response:
-            batting_stats = self.parser.parse_batting_stats(response.text)
-            pitching_stats = self.parser.parse_pitching_stats(response.text)
+            # Try Nuxt payload first (SIDEARM v3 - has both batting + pitching)
+            batting_stats, pitching_stats = self.parser.parse_nuxt_stats(response.text)
+
+            # Fall back to HTML table parsing
+            if not batting_stats:
+                batting_stats = self.parser.parse_batting_stats(response.text)
+            if not pitching_stats:
+                pitching_stats = self.parser.parse_pitching_stats(response.text)
+
             logger.info(f"  Batting stats: {len(batting_stats)} players")
             logger.info(f"  Pitching stats: {len(pitching_stats)} players")
         else:
