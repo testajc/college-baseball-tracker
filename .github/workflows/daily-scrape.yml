@@ -36,9 +36,9 @@ jobs:
         run: |
           python -c "
           from datetime import datetime
-          start = datetime(2026, 2, 21)
+          start = datetime(2026, 2, 14)
           if datetime.now() < start:
-              print('Season has not started yet (starts Feb 21, 2026)')
+              print('Season has not started yet (starts Feb 14, 2026)')
               print('skip=true')
           else:
               print('Season is active')
@@ -50,6 +50,12 @@ jobs:
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Build schools database
+        if: steps.season_check.outputs.skip != 'true' || github.event.inputs.force == 'true'
+        run: |
+          cd scraper
+          python build_schools_db.py
+
       - name: Download previous progress
         if: steps.season_check.outputs.skip != 'true' || github.event.inputs.force == 'true'
         uses: actions/download-artifact@v4
@@ -57,12 +63,6 @@ jobs:
           name: scrape-progress
           path: scraper/
         continue-on-error: true
-
-      - name: Build schools database
-        if: steps.season_check.outputs.skip != 'true' || github.event.inputs.force == 'true'
-        run: |
-          cd scraper
-          python build_schools_db.py
 
       - name: Run scraper
         if: steps.season_check.outputs.skip != 'true' || github.event.inputs.force == 'true'
@@ -93,10 +93,11 @@ jobs:
           path: |
             scraper/scrape_history.json
             scraper/scraper.log
-          retention-days: 30
+          retention-days: 90
+          overwrite: true
 
       - name: Season not started notification
         if: steps.season_check.outputs.skip == 'true' && github.event.inputs.force != 'true'
         run: |
-          echo "::notice::2026 college baseball season hasn't started yet (starts Feb 21, 2026). Skipping scrape."
+          echo "::notice::2026 college baseball season hasn't started yet (starts Feb 14, 2026). Skipping scrape."
           echo "To force a scrape anyway, use workflow_dispatch with force=true."

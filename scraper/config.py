@@ -30,5 +30,5 @@ ERROR_CONFIG = {
 # Stop signals - if we see these, pause immediately
 STOP_SIGNALS = [429, 403, 503]
 
-# Season start date - ALL divisions start third week of February 2026
-SEASON_START_DATE = '2026-02-21'
+# Season start date - D1 opening weekend is mid-February 2026
+SEASON_START_DATE = '2026-02-14'

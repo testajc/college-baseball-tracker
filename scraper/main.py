@@ -84,6 +84,8 @@ class CollegeBaseballScraper:
             '/sports/bsb/2025-26/roster',
             '/sports/bsb/roster',
             '/sports/mens-baseball/roster',
+            '/sports/m-basebl/roster/',    # WMT (Georgia Tech style)
+            '/sport/m-basebl/roster/',     # WMT singular (Arkansas style)
         ]
         STATS_PATHS = [
             school.get('stats_url', '/sports/baseball/stats'),
@@ -93,6 +95,8 @@ class CollegeBaseballScraper:
             '/sports/bsb/2025-26/stats',
             '/sports/bsb/stats',
             '/sports/mens-baseball/stats',
+            '/sports/m-basebl/stats/',     # WMT (Georgia Tech style)
+            '/sport/m-basebl/stats/',      # WMT singular (Arkansas style)
         ]
         # Deduplicate while preserving order
         ROSTER_PATHS = list(dict.fromkeys(ROSTER_PATHS))
@@ -270,7 +274,7 @@ class CollegeBaseballScraper:
                     f"Players: {self.total_players_scraped}")
 
     def run_diagnostic(self):
-        """Test on 3 schools"""
+        """Test on representative schools from each parser strategy"""
         test_schools = [
             {
                 'school_name': 'Louisville',
@@ -281,12 +285,44 @@ class CollegeBaseballScraper:
                 'stats_url': '/sports/baseball/stats'
             },
             {
-                'school_name': 'Tampa',
-                'division': 'D2',
-                'conference': 'SSC',
-                'athletics_base_url': 'https://tampaspartans.com',
+                'school_name': 'Arizona St.',
+                'division': 'D1',
+                'conference': 'Big 12',
+                'athletics_base_url': 'https://thesundevils.com',
                 'roster_url': '/sports/baseball/roster',
                 'stats_url': '/sports/baseball/stats'
+            },
+            {
+                'school_name': 'Cincinnati',
+                'division': 'D1',
+                'conference': 'Big 12',
+                'athletics_base_url': 'https://gobearcats.com',
+                'roster_url': '/sports/baseball/roster',
+                'stats_url': '/sports/baseball/stats'
+            },
+            {
+                'school_name': 'Arkansas',
+                'division': 'D1',
+                'conference': 'SEC',
+                'athletics_base_url': 'https://arkansasrazorbacks.com',
+                'roster_url': '/sport/m-basebl/roster/',
+                'stats_url': 'https://arkansasrazorbacks.com/stats/baseball/2026/teamcume.htm'
+            },
+            {
+                'school_name': 'Jackson St.',
+                'division': 'D1',
+                'conference': 'SWAC',
+                'athletics_base_url': 'https://gojsutigers.com',
+                'roster_url': '/sports/baseball/roster',
+                'stats_url': '/sports/baseball/stats'
+            },
+            {
+                'school_name': 'Clemson',
+                'division': 'D1',
+                'conference': 'ACC',
+                'athletics_base_url': 'https://clemsontigers.com',
+                'roster_url': '/sports/baseball/roster',
+                'stats_url': 'https://data.clemsontigers.com/Stats/Baseball/2026/teamcume.htm'
             },
             {
                 'school_name': 'Chapman',
@@ -299,7 +335,7 @@ class CollegeBaseballScraper:
         ]
 
         print("\n" + "=" * 60)
-        print("DIAGNOSTIC MODE - Testing 3 Schools")
+        print(f"DIAGNOSTIC MODE - Testing {len(test_schools)} Schools")
         print("=" * 60)
 
         for school in test_schools:

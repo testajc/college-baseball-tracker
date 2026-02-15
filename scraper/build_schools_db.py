@@ -47,10 +47,10 @@ KNOWN_SCHOOLS: List[Dict] = [
 
     # ACC
     {"school_name": "Boston College", "division": "D1", "conference": "ACC", "athletics_base_url": "https://bceagles.com"},
-    {"school_name": "Clemson", "division": "D1", "conference": "ACC", "athletics_base_url": "https://clemsontigers.com"},
+    {"school_name": "Clemson", "division": "D1", "conference": "ACC", "athletics_base_url": "https://clemsontigers.com", "stats_url": "https://data.clemsontigers.com/Stats/Baseball/2026/teamcume.htm"},
     {"school_name": "Duke", "division": "D1", "conference": "ACC", "athletics_base_url": "https://goduke.com"},
     {"school_name": "Florida St.", "division": "D1", "conference": "ACC", "athletics_base_url": "https://seminoles.com"},
-    {"school_name": "Georgia Tech", "division": "D1", "conference": "ACC", "athletics_base_url": "https://ramblinwreck.com"},
+    {"school_name": "Georgia Tech", "division": "D1", "conference": "ACC", "athletics_base_url": "https://ramblinwreck.com", "roster_url": "/sports/m-basebl/roster/"},
     {"school_name": "Louisville", "division": "D1", "conference": "ACC", "athletics_base_url": "https://gocards.com"},
     {"school_name": "Miami (FL)", "division": "D1", "conference": "ACC", "athletics_base_url": "https://miamihurricanes.com"},
     {"school_name": "North Carolina", "division": "D1", "conference": "ACC", "athletics_base_url": "https://goheels.com"},
@@ -66,7 +66,7 @@ KNOWN_SCHOOLS: List[Dict] = [
 
     # SEC
     {"school_name": "Alabama", "division": "D1", "conference": "SEC", "athletics_base_url": "https://rolltide.com"},
-    {"school_name": "Arkansas", "division": "D1", "conference": "SEC", "athletics_base_url": "https://arkansasrazorbacks.com"},
+    {"school_name": "Arkansas", "division": "D1", "conference": "SEC", "athletics_base_url": "https://arkansasrazorbacks.com", "roster_url": "/sport/m-basebl/roster/", "stats_url": "https://arkansasrazorbacks.com/stats/baseball/2026/teamcume.htm"},
     {"school_name": "Auburn", "division": "D1", "conference": "SEC", "athletics_base_url": "https://auburntigers.com"},
     {"school_name": "Florida", "division": "D1", "conference": "SEC", "athletics_base_url": "https://floridagators.com"},
     {"school_name": "Georgia", "division": "D1", "conference": "SEC", "athletics_base_url": "https://georgiadogs.com"},
@@ -233,8 +233,8 @@ KNOWN_SCHOOLS: List[Dict] = [
     # SWAC
     {"school_name": "Alabama St.", "division": "D1", "conference": "SWAC", "athletics_base_url": "https://bamastatesports.com"},
     {"school_name": "Alcorn", "division": "D1", "conference": "SWAC", "athletics_base_url": "https://alcornsports.com"},
-    {"school_name": "Grambling", "division": "D1", "conference": "SWAC", "athletics_base_url": "https://gotigers.com"},
-    {"school_name": "Jackson St.", "division": "D1", "conference": "SWAC", "athletics_base_url": "https://jsutigers.com"},
+    {"school_name": "Grambling", "division": "D1", "conference": "SWAC", "athletics_base_url": "https://gsutigers.com"},
+    {"school_name": "Jackson St.", "division": "D1", "conference": "SWAC", "athletics_base_url": "https://gojsutigers.com"},
     {"school_name": "Prairie View A&M", "division": "D1", "conference": "SWAC", "athletics_base_url": "https://pvpanthers.com"},
     {"school_name": "Southern", "division": "D1", "conference": "SWAC", "athletics_base_url": "https://gojagsports.com"},
     {"school_name": "Texas Southern", "division": "D1", "conference": "SWAC", "athletics_base_url": "https://tsusports.com"},

@@ -7,7 +7,7 @@ Alcorn,D1,SWAC,https://alcornsports.com,/sports/baseball/roster,/sports/baseball
 App State,D1,Sun Belt,https://appstatesports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Arizona,D1,Big 12,https://arizonawildcats.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Arizona St.,D1,Big 12,https://thesundevils.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Arkansas,D1,SEC,https://arkansasrazorbacks.com,/sports/baseball/roster,/sports/baseball/stats,,high
+Arkansas,D1,SEC,https://arkansasrazorbacks.com,/sport/m-basebl/roster/,https://arkansasrazorbacks.com/stats/baseball/2026/teamcume.htm,,high
 Army,D1,Patriot,https://goarmywestpoint.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Auburn,D1,SEC,https://auburntigers.com,/sports/baseball/roster,/sports/baseball/stats,,high
 BYU,D1,Big 12,https://byucougars.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -33,7 +33,7 @@ Central Michigan,D1,MAC,https://cmuchippewas.com,/sports/baseball/roster,/sports
 Charleston Southern,D1,Big South,https://csusports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Charlotte,D1,AAC,https://charlotte49ers.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Cincinnati,D1,Big 12,https://gobearcats.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Clemson,D1,ACC,https://clemsontigers.com,/sports/baseball/roster,/sports/baseball/stats,,high
+Clemson,D1,ACC,https://clemsontigers.com,/sports/baseball/roster,https://data.clemsontigers.com/Stats/Baseball/2026/teamcume.htm,,high
 Coastal Carolina,D1,Sun Belt,https://goccusports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 College of Charleston,D1,CAA,https://cofcsports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Colorado,D1,Big 12,https://cubuffs.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -70,9 +70,9 @@ Georgetown,D1,Big East,https://guhoyas.com,/sports/baseball/roster,/sports/baseb
 Georgia,D1,SEC,https://georgiadogs.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Georgia Southern,D1,Sun Belt,https://gseagles.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Georgia St.,D1,Sun Belt,https://georgiastatesports.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Georgia Tech,D1,ACC,https://ramblinwreck.com,/sports/baseball/roster,/sports/baseball/stats,,high
+Georgia Tech,D1,ACC,https://ramblinwreck.com,/sports/m-basebl/roster/,/sports/baseball/stats,,high
 Gonzaga,D1,WCC,https://gozags.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Grambling,D1,SWAC,https://gotigers.com,/sports/baseball/roster,/sports/baseball/stats,,high
+Grambling,D1,SWAC,https://gsutigers.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Grand Canyon,D1,WAC,https://gculopes.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Hartford,D1,America East,https://hartfordhawks.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Harvard,D1,Ivy,https://gocrimson.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -90,7 +90,7 @@ Indiana St.,D1,MVC,https://gosycamores.com,/sports/baseball/roster,/sports/baseb
 Iona,D1,MAAC,https://icgaels.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Iowa,D1,Big Ten,https://hawkeyesports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Iowa St.,D1,Big 12,https://cyclones.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Jackson St.,D1,SWAC,https://jsutigers.com,/sports/baseball/roster,/sports/baseball/stats,,high
+Jackson St.,D1,SWAC,https://gojsutigers.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Jacksonville,D1,ASUN,https://judolphins.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Jacksonville St.,D1,C-USA,https://jsugamecocksports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Kansas,D1,Big 12,https://kuathletics.com,/sports/baseball/roster,/sports/baseball/stats,,high

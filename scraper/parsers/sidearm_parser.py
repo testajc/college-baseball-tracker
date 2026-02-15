@@ -20,6 +20,13 @@ class SidearmParser:
         soup = BeautifulSoup(html, 'html.parser')
         players = []
 
+        # Strategy 0: Nuxt devalue payload (SIDEARM v3 nextgen sites)
+        # These sites render rosters entirely client-side; HTML has no tables/cards.
+        players = self.parse_nuxt_roster(html, school_name)
+        if players:
+            logger.debug(f"Found {len(players)} players via Nuxt payload")
+            return players
+
         # Strategy 1: Table with roster-specific class
         roster_table = soup.find('table', class_=re.compile(r'roster|sidearm-table', re.I))
         if roster_table:
@@ -249,6 +256,128 @@ class SidearmParser:
 
     # ── Nuxt payload parser (SIDEARM v3) ─────────────────────────────
 
+    def _extract_nuxt_payload(self, html: str):
+        """Extract devalue-serialized Nuxt payload from HTML script tags.
+        Returns the parsed JSON list or None."""
+        scripts = re.findall(r'<script[^>]*>(.*?)</script>', html, re.DOTALL)
+        for s in scripts:
+            s = s.strip()
+            if s.startswith('[["ShallowReactive"') or s.startswith('[["Reactive"'):
+                try:
+                    return json.loads(s)
+                except json.JSONDecodeError:
+                    continue
+        return None
+
+    def parse_nuxt_roster(self, html: str, school_name: str) -> List[Dict]:
+        """
+        Extract roster data from a SIDEARM v3 Nuxt devalue payload.
+        The payload is embedded in a <script type="application/json" id="__NUXT_DATA__"> tag.
+
+        Payload structure (after devalue resolution):
+          payload[1]["data"] -> (resolve ShallowReactive) -> dict with keys like:
+            "roster-{id}-players-list-page-{n}" -> {"players": [...], "meta": {...}}
+
+        Each player entry contains:
+          - player: {first_name, last_name, full_name, slug}
+          - player_position: {abbreviation, name}  (e.g. "INF", "RHP", "C")
+          - class_level: {name}  (e.g. "Redshirt Junior", "Sophomore")
+          - height_feet, height_inches, weight, jersey_number
+          - profile_field_values: [{profileField: {name: "B/T"}, value: "R/R"}]
+
+        Returns list of player dicts in the same format as parse_roster().
+        """
+        payload = self._extract_nuxt_payload(html)
+        if not payload:
+            return []
+
+        # Navigate to the roster players list
+        try:
+            root = payload[1]
+            data_idx = root.get('data')
+            if data_idx is None:
+                return []
+            data_obj = payload[data_idx]
+            # Resolve ShallowReactive/Reactive wrapper
+            if isinstance(data_obj, list) and len(data_obj) == 2 and isinstance(data_obj[0], str) \
+                    and data_obj[0] in ('ShallowReactive', 'Reactive'):
+                data_obj = payload[data_obj[1]]
+            if not isinstance(data_obj, dict):
+                return []
+
+            # Find the roster players key (pattern: "roster-{id}-players-list-page-{n}")
+            roster_key = None
+            for k in data_obj.keys():
+                if 'roster' in k and 'players-list' in k:
+                    roster_key = k
+                    break
+            if not roster_key:
+                return []
+
+            roster_ref = data_obj[roster_key]
+            roster_container = payload[roster_ref]  # {'players': X, 'meta': Y}
+            players_list_ref = roster_container['players']
+            player_refs = payload[players_list_ref]  # list of indices
+        except (IndexError, KeyError, TypeError, AttributeError) as e:
+            logger.debug(f"Nuxt roster navigation failed: {e}")
+            return []
+
+        # Resolve each player entry individually (avoid resolving entire tree)
+        players = []
+        for ref in player_refs:
+            try:
+                player_data = self._resolve_nuxt_payload(payload, ref)
+                if not isinstance(player_data, dict):
+                    continue
+
+                player_obj = player_data.get('player', {})
+                pos_obj = player_data.get('player_position', {})
+                class_obj = player_data.get('class_level', {})
+
+                name = player_obj.get('full_name', '') if isinstance(player_obj, dict) else ''
+                if not name:
+                    continue
+
+                entry = {'name': name, 'school': school_name}
+
+                jn = player_data.get('jersey_number')
+                if jn is not None:
+                    entry['jersey_number'] = str(jn)
+
+                if isinstance(pos_obj, dict):
+                    entry['position'] = pos_obj.get('abbreviation') or pos_obj.get('name', '')
+
+                if isinstance(class_obj, dict):
+                    entry['class_year'] = class_obj.get('name', '')
+
+                ht_ft = player_data.get('height_feet')
+                ht_in = player_data.get('height_inches')
+                if ht_ft is not None and ht_in is not None:
+                    entry['height'] = f"{ht_ft}-{ht_in}"
+
+                wt = player_data.get('weight')
+                if wt is not None:
+                    entry['weight'] = str(wt)
+
+                # Extract B/T from profile_field_values
+                pfvs = player_data.get('profile_field_values', [])
+                if isinstance(pfvs, list):
+                    for pfv in pfvs:
+                        if isinstance(pfv, dict):
+                            pf = pfv.get('profileField', pfv.get('profile_field', {}))
+                            if isinstance(pf, dict) and pf.get('name') == 'B/T':
+                                entry['bats_throws'] = pfv.get('value', '')
+
+                players.append(entry)
+            except Exception as e:
+                logger.debug(f"Failed to resolve Nuxt roster player: {e}")
+                continue
+
+        if players:
+            logger.info(f"  Nuxt roster: {len(players)} players from {school_name}")
+
+        return players
+
     def _resolve_nuxt_payload(self, payload: list, idx: int, depth: int = 0):
         """Recursively resolve Nuxt devalue references."""
         if depth > 20 or not isinstance(idx, int) or idx < 0 or idx >= len(payload):
@@ -273,16 +402,7 @@ class SidearmParser:
         pitching = {}
 
         # Find the devalue payload script
-        scripts = re.findall(r'<script[^>]*>(.*?)</script>', html, re.DOTALL)
-        payload = None
-        for s in scripts:
-            s = s.strip()
-            if s.startswith('[["ShallowReactive"') or s.startswith('[["Reactive"'):
-                try:
-                    payload = json.loads(s)
-                    break
-                except json.JSONDecodeError:
-                    continue
+        payload = self._extract_nuxt_payload(html)
 
         if not payload:
             return batting, pitching
@@ -310,13 +430,17 @@ class SidearmParser:
             first_season_key = next(iter(cume))
             season_data = cume[first_season_key]
 
+            # Early-season: cumulativeStats can have {season_id: None}
+            if not season_data:
+                return batting, pitching
+
             individual = season_data.get('overallIndividualStats', {})
             ind_stats = individual.get('individualStats', {})
 
             hitting_list = ind_stats.get('individualHittingStats', [])
             pitching_list = ind_stats.get('individualPitchingStats', [])
 
-        except (IndexError, KeyError, TypeError, StopIteration) as e:
+        except (IndexError, KeyError, TypeError, StopIteration, AttributeError) as e:
             logger.debug(f"Nuxt payload navigation failed: {e}")
             return batting, pitching
 
