@@ -123,7 +123,8 @@ export async function GET(req: NextRequest) {
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
   } catch (error) {
-    console.error("Error fetching players:", error);
-    return NextResponse.json({ error: "Failed to fetch players" }, { status: 500 });
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("Error fetching players:", msg, error);
+    return NextResponse.json({ error: `Failed to fetch players: ${msg}` }, { status: 500 });
   }
 }

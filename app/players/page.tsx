@@ -13,6 +13,7 @@ export default function PlayersPage() {
   const [players, setPlayers] = useState<PlayerWithStats[]>([]);
   const [filters, setFilters] = useState<PlayerFilters>({ statType: "hitting" });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [conferences, setConferences] = useState<string[]>([]);
@@ -71,11 +72,24 @@ export default function PlayersPage() {
     if (filters.minIP) params.set("minIP", String(filters.minIP));
 
     try {
+      setError(null);
       const res = await fetch(`/api/players?${params}`);
+      if (!res.ok) {
+        const text = await res.text();
+        setError(`API error ${res.status}: ${text.slice(0, 200)}`);
+        setPlayers([]);
+        return;
+      }
       const data = await res.json();
+      if (data.error) {
+        setError(data.error);
+        setPlayers([]);
+        return;
+      }
       setPlayers(data.players ?? []);
       setTotalPages(data.pagination?.totalPages ?? 1);
-    } catch {
+    } catch (e) {
+      setError(`Fetch failed: ${e instanceof Error ? e.message : String(e)}`);
       setPlayers([]);
     } finally {
       setLoading(false);
@@ -110,6 +124,11 @@ export default function PlayersPage() {
         </aside>
 
         <div className="min-w-0 flex-1">
+          {error && (
+            <div className="mb-4 rounded border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-400">
+              {error}
+            </div>
+          )}
           {loading ? (
             <div className="py-12 text-center text-muted-foreground">Loading...</div>
           ) : (
