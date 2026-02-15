@@ -187,6 +187,10 @@ class ProtectedRequestHandler:
                 logger.debug(f"OK {url} ({self.hourly_request_count} req/hr)")
                 return response
 
+            except requests.exceptions.SSLError as e:
+                logger.warning(f"SSL error for {url} - skipping host")
+                return None
+
             except requests.Timeout:
                 logger.warning(f"Timeout for {url} (attempt {attempt + 1}/{max_retries})")
                 self.consecutive_failures += 1
