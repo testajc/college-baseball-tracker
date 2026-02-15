@@ -199,8 +199,37 @@ Daily scrape runs via `.github/workflows/daily-scrape.yml`:
 - **Tampa (D2)** - All stats URL paths 404. Uses non-standard SIDEARM paths.
 - **Pitching on older SIDEARM** - HTML table parser gets pitching fine on D3 sites. D1 SIDEARM v3 only server-renders batting HTML, but the Nuxt parser handles pitching.
 - **Season start date** - Config hardcodes `2026-02-21` but some D1 teams play earlier (mid-Feb). Use `--force` to override.
+- **NoneType error on empty rosters** - Colorado, Iowa St. crash with `'NoneType' object has no attribute 'get'` when roster returns 0 players but stats response exists. Non-fatal (caught by try/except), schools just skipped.
+- **Schools with 0 roster players** - Arizona St., Auburn, Cincinnati, Grambling return roster pages but parser finds 0 players. May need parser updates for their specific HTML layouts.
+
+## Database Stats (as of Feb 14, 2026)
+
+| Table | Count |
+|-------|-------|
+| Teams | 797 |
+| Players | 8,484 |
+| Hitting Stats | 2,629 |
+| Pitching Stats | 1,888 |
+
+| Division | Teams | Players |
+|----------|-------|---------|
+| D1 | 424 | 7,014 |
+| D2 | 99 | 858 |
+| D3 | 274 | 612 |
 
 ## Recent Changes
+
+### Session 3 (Feb 14, 2026) - First Full Scrape
+1. **Ran full scrape** - `python main.py run --force` across all D1 schools (pre-season)
+2. **SSL error fix** - Dallas Baptist's expired SSL cert triggered circuit breaker (30-min cooldowns in a loop). Added `requests.exceptions.SSLError` catch in `request_handler.py` that returns None immediately without retries or circuit breaker increment
+3. **Scrape completed in 2 runs** - First run: 38/100 schools before circuit breaker killed it. After SSL fix, second run: 90/100 successful (scheduler skipped already-scraped schools)
+4. **Results** - 8,484 players, 2,629 hitting stats, 1,888 pitching stats loaded into production DB
+5. **Failed schools (10/100):**
+   - Arizona St., Auburn, Cincinnati, Grambling - 0 roster players found
+   - Arkansas, Jackson St. - All URL paths returned 404
+   - Dallas Baptist - SSL certificate error (skipped)
+   - Colorado, Iowa St. - NoneType error when roster empty but stats response exists
+   - Georgia Tech, Clemson - Roster works but all stats URLs 404
 
 ### Session 2 (Feb 14, 2026) - Scraper Testing & Fixes
 1. **Ran first diagnostic** - Tested scraper on Vanderbilt (D1), Tampa (D2), Chapman (D3)
@@ -223,19 +252,21 @@ Daily scrape runs via `.github/workflows/daily-scrape.yml`:
 
 ## Next Steps / Ideas
 
-1. **Run full scrape** - Season starts Feb 21; run `python main.py run` to populate database
-2. **Fix Tampa (D2)** - Find correct stats URL pattern for their site
-3. **WMT Games integration** - Handle Vanderbilt/LSU-style sites (headless browser or API)
-4. **Portal alerts** - Test and verify email notification system works
-5. **Player comparison** - Add ability to compare multiple players side-by-side
-6. **Export functionality** - Export filtered results to CSV
-7. **Advanced search** - Search by hometown, high school
-8. **Watchlist notifications** - Email when favorited player stats update
-9. **Mobile optimization** - Review and improve mobile filter panel UX
+1. **Fix failed schools** - Investigate the 10 D1 schools that failed (0 roster, 404s, NoneType bug)
+2. **Run D2/D3 scrape** - Full scrape so far only covered D1; need to run D2 and D3
+3. **Fix Tampa (D2)** - Find correct stats URL pattern for their site
+4. **WMT Games integration** - Handle Vanderbilt/LSU-style sites (headless browser or API)
+5. **Portal alerts** - Test and verify email notification system works
+6. **Player comparison** - Add ability to compare multiple players side-by-side
+7. **Export functionality** - Export filtered results to CSV
+8. **Advanced search** - Search by hometown, high school
+9. **Watchlist notifications** - Email when favorited player stats update
+10. **Mobile optimization** - Review and improve mobile filter panel UX
 
 ## Git History (Recent)
 
 ```
+0cd5416 Fix SSL errors triggering circuit breaker cooldown
 794bc8a Add Nuxt payload parser for SIDEARM v3 pitching stats
 0d810fc Fix scraper for SIDEARM v3 stats pages (D1 support)
 a136d28 Add CLAUDE.md with project status documentation
