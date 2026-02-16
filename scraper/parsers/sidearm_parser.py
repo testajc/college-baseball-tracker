@@ -166,7 +166,7 @@ class SidearmParser:
                 header_map['jersey_number'] = i
             elif 'pos' in h_clean and 'previous' not in h_clean:
                 header_map['position'] = i
-            elif h_clean in ['yr', 'year', 'cl', 'class', 'elig', 'eligibility']:
+            elif h_clean in ['yr', 'cl', 'class', 'elig', 'eligibility'] or 'year' in h_clean:
                 header_map['class_year'] = i
             elif h_clean in ['bt', 'b/t', 'b-t']:
                 header_map['bats_throws'] = i
