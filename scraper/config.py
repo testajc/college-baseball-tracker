@@ -4,9 +4,9 @@
 INITIAL_SCRAPE_CONFIG = {
     'between_requests': (5, 10),           # 5-10 seconds between requests
     'between_pages_same_school': (3, 6),
-    'between_schools': (15, 25),           # 15-25 seconds between schools
-    'max_schools_per_day': 500,            # 500 schools per run (~5.5 hours)
-    'max_requests_per_hour': 250,
+    'between_schools': (10, 18),           # 10-18 seconds between different sites
+    'max_schools_per_day': 500,            # 500 schools per run (~3.5 hours)
+    'max_requests_per_hour': 300,
 }
 
 # Phase 2: Daily Updates (faster, since we're just refreshing)
