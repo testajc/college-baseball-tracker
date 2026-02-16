@@ -384,6 +384,13 @@ class DatabaseManager:
             """, (status, teams_scraped, players_scraped, errors, log_id))
             conn.commit()
 
+    def get_schools_scraped_today(self) -> set:
+        """Return set of school names already scraped today (based on teams.updated_at)"""
+        conn = self._get_conn()
+        with conn.cursor() as cur:
+            cur.execute("SELECT name FROM teams WHERE updated_at >= CURRENT_DATE")
+            return {row[0] for row in cur.fetchall()}
+
     def save_school_data(self, result: dict):
         """Save a full school scrape result to the database"""
         school_name = result['school']
