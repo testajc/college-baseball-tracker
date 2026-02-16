@@ -1,12 +1,12 @@
 # scraper/config.py
 
-# Phase 1: Initial Scrape (conservative)
+# Phase 1: Initial Scrape
 INITIAL_SCRAPE_CONFIG = {
-    'between_requests': (8, 15),           # 8-15 seconds between requests
-    'between_pages_same_school': (5, 10),
-    'between_schools': (30, 60),           # 30-60 seconds between schools
-    'max_schools_per_day': 100,            # 100 schools per day
-    'max_requests_per_hour': 150,
+    'between_requests': (5, 10),           # 5-10 seconds between requests
+    'between_pages_same_school': (3, 6),
+    'between_schools': (15, 25),           # 15-25 seconds between schools
+    'max_schools_per_day': 500,            # 500 schools per run (~5.5 hours)
+    'max_requests_per_hour': 250,
 }
 
 # Phase 2: Daily Updates (faster, since we're just refreshing)
