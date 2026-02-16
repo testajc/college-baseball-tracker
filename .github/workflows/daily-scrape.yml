@@ -64,6 +64,14 @@ jobs:
           path: scraper/
         continue-on-error: true
 
+      - name: Clean up bad data
+        if: steps.season_check.outputs.skip != 'true' || github.event.inputs.force == 'true'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          cd scraper
+          python main.py cleanup
+
       - name: Run scraper
         if: steps.season_check.outputs.skip != 'true' || github.event.inputs.force == 'true'
         env:

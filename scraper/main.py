@@ -372,10 +372,56 @@ class CollegeBaseballScraper:
         print("=" * 60)
 
 
+    def run_cleanup(self):
+        """Delete players with invalid names (stat values as names)"""
+        import psycopg2
+        conn = psycopg2.connect(self.db.database_url)
+        with conn.cursor() as cur:
+            # Find bad players: first_name looks like a stat (.500, 1.000, etc.)
+            cur.execute("""
+                SELECT COUNT(*) FROM players
+                WHERE first_name ~ '^[\\d.\\-/]+$' OR (first_name = '' AND last_name = '')
+            """)
+            count = cur.fetchone()[0]
+            if count == 0:
+                print("No bad records found.")
+                conn.close()
+                return
+
+            print(f"Found {count} players with invalid names (stat values). Deleting...")
+
+            # Delete associated stats first (cascade should handle this, but be explicit)
+            cur.execute("""
+                DELETE FROM hitting_stats WHERE player_id IN (
+                    SELECT id FROM players
+                    WHERE first_name ~ '^[\\d.\\-/]+$' OR (first_name = '' AND last_name = '')
+                )
+            """)
+            print(f"  Deleted {cur.rowcount} hitting_stats records")
+
+            cur.execute("""
+                DELETE FROM pitching_stats WHERE player_id IN (
+                    SELECT id FROM players
+                    WHERE first_name ~ '^[\\d.\\-/]+$' OR (first_name = '' AND last_name = '')
+                )
+            """)
+            print(f"  Deleted {cur.rowcount} pitching_stats records")
+
+            cur.execute("""
+                DELETE FROM players
+                WHERE first_name ~ '^[\\d.\\-/]+$' OR (first_name = '' AND last_name = '')
+            """)
+            print(f"  Deleted {cur.rowcount} player records")
+
+            conn.commit()
+        conn.close()
+        print("Cleanup complete.")
+
+
 def main():
     parser = argparse.ArgumentParser(description='College Baseball Stats Scraper')
-    parser.add_argument('command', choices=['run', 'diagnostic', 'status'],
-                        help='run=daily scrape, diagnostic=test 3 schools, status=show progress')
+    parser.add_argument('command', choices=['run', 'diagnostic', 'status', 'cleanup'],
+                        help='run=daily scrape, diagnostic=test schools, status=show progress, cleanup=fix bad data')
     parser.add_argument('--force', '-f', action='store_true',
                         help='Force scrape even if season has not started')
     parser.add_argument('--dry-run', action='store_true',
@@ -391,6 +437,8 @@ def main():
         scraper.run_diagnostic()
     elif args.command == 'status':
         print(scraper.scheduler.get_status_report())
+    elif args.command == 'cleanup':
+        scraper.run_cleanup()
 
 
 if __name__ == '__main__':

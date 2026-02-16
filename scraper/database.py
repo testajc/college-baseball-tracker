@@ -151,6 +151,10 @@ class DatabaseManager:
         conn = self._get_conn()
 
         first_name, last_name = self._split_name(player_data.get('name', ''))
+
+        # Reject names that look like stat values (e.g. ".500", "1.000")
+        if not first_name or re.match(r'^[\d.\-/]+$', first_name):
+            return -1
         position = self._normalize_position(player_data.get('position'))
         class_year = self._normalize_class_year(player_data.get('class_year'))
         height = self._parse_height(player_data.get('height'))
@@ -393,6 +397,8 @@ class DatabaseManager:
         for player_data in result.get('players', []):
             try:
                 player_id = self.upsert_player(team_id, player_data)
+                if player_id < 0:
+                    continue
 
                 if player_data.get('batting_stats'):
                     self.upsert_hitting_stats(player_id, player_data['batting_stats'])

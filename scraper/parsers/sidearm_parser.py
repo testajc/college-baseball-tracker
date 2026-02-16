@@ -123,12 +123,20 @@ class SidearmParser:
                 # Remove trailing jersey number (e.g. "Briggs Ellis 0")
                 cleaned = re.sub(r'\s+\d{1,2}$', '', cleaned)
                 if cleaned:
+                    # Normalize "Last, First" to "First Last"
+                    if ',' in cleaned:
+                        parts = cleaned.split(',', 1)
+                        cleaned = f"{parts[1].strip()} {parts[0].strip()}"
                     return cleaned
 
         # Fallback: direct cell text
         text = self._clean_cell_text(cell)
         # Remove trailing jersey number
         text = re.sub(r'\s+\d{1,2}$', '', text)
+        # Normalize "Last, First" to "First Last"
+        if ',' in text:
+            parts = text.split(',', 1)
+            text = f"{parts[1].strip()} {parts[0].strip()}"
         return text
 
     def _parse_table_roster(self, table) -> List[Dict]:
@@ -711,7 +719,7 @@ class SidearmParser:
         start_idx = 1 if headers else 0
 
         for row in rows[start_idx:]:
-            cells = row.find_all('td')
+            cells = row.find_all(['td', 'th'])
             if len(cells) < 3:
                 continue
 
@@ -732,12 +740,7 @@ class SidearmParser:
 
                 # Player name
                 if i == name_idx or header in ['name', 'player', 'athlete']:
-                    # Normalize "Last, First" to "First Last"
-                    if ',' in value:
-                        parts = value.split(',', 1)
-                        player_name = f"{parts[1].strip()} {parts[0].strip()}"
-                    else:
-                        player_name = value
+                    player_name = self._extract_name(cell)
                     continue
 
                 # Skip jersey number
@@ -751,8 +754,11 @@ class SidearmParser:
                     if parsed_value is not None:
                         player_stats[stat_key] = parsed_value
 
+            # Reject names that look like stat values (e.g. ".500", "12", "4-2")
+            if player_name and re.match(r'^[\d.\-/]+$', player_name):
+                player_name = None
+
             if player_name and player_stats:
-                # Calculate derived stats
                 if stat_type == 'batting':
                     player_stats = self._calc_batting_derived(player_stats)
                 else:
