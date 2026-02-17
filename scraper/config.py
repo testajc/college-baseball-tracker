@@ -5,7 +5,7 @@ INITIAL_SCRAPE_CONFIG = {
     'between_requests': (5, 10),           # 5-10 seconds between requests
     'between_pages_same_school': (3, 6),
     'between_schools': (10, 18),           # 10-18 seconds between different sites
-    'max_schools_per_day': 350,            # 350 schools per run (~4 hours with margin)
+    'max_schools_per_day': 1000,            # DB checkpoint handles dedup; 6hr timeout is the real limit
     'max_requests_per_hour': 300,
 }
 
