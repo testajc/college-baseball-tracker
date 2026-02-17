@@ -93,11 +93,18 @@ class CollegeBaseballScraper:
         # Try roster URL patterns
         response = None
         roster_url = None
+        base_domain = base_url.split('//')[1].split('/')[0] if '//' in base_url else base_url
         for path in ROSTER_PATHS:
             url = f"{base_url}{path}" if not path.startswith('http') else path
             logger.debug(f"Trying roster: {url}")
             resp = self.request_handler.get(url)
             if resp:
+                # Skip if redirected to a different domain or to homepage
+                resp_domain = resp.url.split('//')[1].split('/')[0] if '//' in resp.url else ''
+                resp_path = resp.url.split(resp_domain, 1)[1] if resp_domain in resp.url else '/'
+                if resp_domain != base_domain and len(resp_path.strip('/')) < 5:
+                    logger.info(f"  Redirected to different domain ({resp_domain}), skipping")
+                    break
                 response = resp
                 roster_url = url
                 break
@@ -107,7 +114,7 @@ class CollegeBaseballScraper:
                 break
 
         if not response:
-            result['errors'].append(f"Failed to fetch roster from {base_url} (tried paths)")
+            result['errors'].append(f"Failed to fetch roster from {base_url}")
             return result
 
         roster = self.parser.parse_roster(response.text, school_name)
@@ -115,6 +122,7 @@ class CollegeBaseballScraper:
 
         if not roster:
             result['errors'].append("No players parsed from roster page")
+            return result  # No point fetching stats if roster is empty
 
         # Wait before stats request
         time.sleep(random.uniform(*self.config['between_pages_same_school']))

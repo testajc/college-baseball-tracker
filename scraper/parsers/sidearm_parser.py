@@ -69,6 +69,12 @@ class SidearmParser:
                 if players:
                     logger.debug(f"Found {len(players)} players via card parser")
 
+        # Strategy 4: JSON-LD Schema.org Person data (some SIDEARM D2/D3 sites)
+        if not players:
+            players = self._parse_jsonld_roster(soup)
+            if players:
+                logger.debug(f"Found {len(players)} players via JSON-LD")
+
         # Sanity check: a baseball roster should have 15-55 players
         if len(players) > 60:
             logger.warning(f"Roster has {len(players)} players (unusually large), may include non-players")
@@ -211,6 +217,48 @@ class SidearmParser:
 
             if player.get('name'):
                 players.append(player)
+
+        return players
+
+    def _parse_jsonld_roster(self, soup) -> List[Dict]:
+        """Parse JSON-LD Schema.org Person data from roster pages.
+        Some SIDEARM D2/D3 sites embed roster in JSON-LD script tags."""
+        import json as _json
+        players = []
+        for script in soup.find_all('script', type='application/ld+json'):
+            try:
+                data = _json.loads(script.string or '')
+            except (ValueError, TypeError):
+                continue
+
+            items = []
+            # Can be a single object or a list
+            if isinstance(data, list):
+                items = data
+            elif isinstance(data, dict):
+                # ItemList with itemListElement
+                if data.get('@type') == 'ItemList':
+                    items = [el.get('item', el) for el in data.get('itemListElement', [])]
+                elif data.get('@type') == 'Person':
+                    items = [data]
+
+            for item in items:
+                if not isinstance(item, dict):
+                    continue
+                if item.get('@type') != 'Person':
+                    continue
+                name = item.get('name', '').strip()
+                if not name:
+                    continue
+                players.append({
+                    'name': name,
+                    'position': None,
+                    'class_year': None,
+                    'height': None,
+                    'weight': None,
+                    'bats': None,
+                    'throws': None,
+                })
 
         return players
 
