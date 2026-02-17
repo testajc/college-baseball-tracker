@@ -72,6 +72,30 @@ jobs:
           cd scraper
           python main.py cleanup
 
+      - name: Debug DB checkpoint
+        if: steps.season_check.outputs.skip != 'true' || github.event.inputs.force == 'true'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          cd scraper
+          python -c "
+          from database import DatabaseManager
+          from scheduler import SmartScheduler
+          db = DatabaseManager()
+          s = SmartScheduler()
+          in_db = db.get_schools_in_db()
+          schools = s.get_schools_to_scrape_today()
+          remaining = [x for x in schools if x['school_name'] not in in_db]
+          d1 = [x for x in remaining if x.get('division') == 'D1']
+          d2 = [x for x in remaining if x.get('division') == 'D2']
+          d3 = [x for x in remaining if x.get('division') == 'D3']
+          print(f'Teams in DB: {len(in_db)}')
+          print(f'Scheduler returned: {len(schools)}')
+          print(f'After DB checkpoint: {len(remaining)} (D1={len(d1)} D2={len(d2)} D3={len(d3)})')
+          print(f'First 10 to scrape: {[x[\"school_name\"]+\" (\"+x.get(\"division\",\"?\")+\")\" for x in remaining[:10]]}')
+          db.close()
+          "
+
       - name: Run scraper
         if: steps.season_check.outputs.skip != 'true' || github.event.inputs.force == 'true'
         env:
