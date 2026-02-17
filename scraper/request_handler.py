@@ -170,7 +170,7 @@ class ProtectedRequestHandler:
                 response = self.session.get(
                     url,
                     headers=self._get_headers(referer),
-                    timeout=30,
+                    timeout=15,
                     allow_redirects=True
                 )
 

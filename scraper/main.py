@@ -113,9 +113,9 @@ class CollegeBaseballScraper:
                 response = resp
                 roster_url = url
                 break
-            # Domain is completely unreachable — don't waste time on more paths
-            if self.request_handler.last_error_type in ('connection', 'ssl'):
-                logger.info(f"  Domain unreachable, skipping remaining roster paths")
+            # Domain unreachable or timing out — don't waste time on more paths
+            if self.request_handler.last_error_type in ('connection', 'ssl', 'timeout'):
+                logger.info(f"  Domain down/timeout, skipping remaining roster paths")
                 break
 
         if not response:
@@ -150,9 +150,9 @@ class CollegeBaseballScraper:
                     continue
                 stats_response = resp
                 break
-            # Domain unreachable — skip remaining stats paths
-            if self.request_handler.last_error_type in ('connection', 'ssl'):
-                logger.info(f"  Domain unreachable, skipping remaining stats paths")
+            # Domain unreachable or timing out — skip remaining stats paths
+            if self.request_handler.last_error_type in ('connection', 'ssl', 'timeout'):
+                logger.info(f"  Domain down/timeout, skipping remaining stats paths")
                 break
 
         batting_stats = {}
