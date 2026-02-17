@@ -26,6 +26,17 @@ class DatabaseManager:
     def _get_conn(self):
         if self.conn is None or self.conn.closed:
             self.conn = psycopg2.connect(self.database_url)
+            return self.conn
+        # Test if connection is still alive
+        try:
+            self.conn.cursor().execute("SELECT 1")
+        except Exception:
+            logger.warning("DB connection lost, reconnecting...")
+            try:
+                self.conn.close()
+            except Exception:
+                pass
+            self.conn = psycopg2.connect(self.database_url)
         return self.conn
 
     def close(self):

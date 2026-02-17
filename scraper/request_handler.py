@@ -94,30 +94,18 @@ class ProtectedRequestHandler:
         """Handle error responses. Returns True if should retry."""
         status = response.status_code
 
-        if status in STOP_SIGNALS:
-            logger.error(f"RECEIVED {status} FROM {url}")
+        if status == 429:
+            # Actually rate-limited — respect Retry-After, max 60s
+            retry_after = response.headers.get('Retry-After', 60)
+            wait_time = min(int(retry_after) if str(retry_after).isdigit() else 60, 60)
+            logger.warning(f"Rate limited (429) from {url}. Waiting {wait_time}s...")
             self.consecutive_failures += 1
-
-            if status == 429:
-                retry_after = response.headers.get('Retry-After', 300)
-                wait_time = int(retry_after) if str(retry_after).isdigit() else 300
-                logger.warning(f"Rate limited (429). Waiting {wait_time} seconds...")
-                self.pause_until = datetime.now() + timedelta(seconds=wait_time)
-                self.is_paused = True
-
-            elif status == 403:
-                logger.error("Forbidden (403). May be IP blocked. Waiting 30 minutes...")
-                self.pause_until = datetime.now() + timedelta(minutes=30)
-                self.is_paused = True
-
-            elif status == 503:
-                logger.warning("Service unavailable (503). Waiting 5 minutes...")
-                self.pause_until = datetime.now() + timedelta(minutes=5)
-                self.is_paused = True
-
+            self.pause_until = datetime.now() + timedelta(seconds=wait_time)
+            self.is_paused = True
             return False
 
-        # Other errors (404, 500, etc.) - don't pause, just skip
+        # 403, 503, and all other errors — just skip, don't pause.
+        # A 403 from one school doesn't mean we're IP blocked everywhere.
         if status >= 400:
             logger.warning(f"HTTP {status} for {url} - skipping")
             return False

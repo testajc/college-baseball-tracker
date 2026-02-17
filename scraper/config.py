@@ -27,8 +27,8 @@ ERROR_CONFIG = {
     'circuit_breaker_cooldown': 300,       # 5 minutes
 }
 
-# Stop signals - if we see these, pause immediately
-STOP_SIGNALS = [429, 403, 503]
+# Stop signals - only 429 triggers a pause (actual rate limiting)
+STOP_SIGNALS = [429]
 
 # Season start date - D1 opening weekend is mid-February 2026
 SEASON_START_DATE = '2026-02-14'
