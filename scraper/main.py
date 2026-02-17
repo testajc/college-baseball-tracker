@@ -75,28 +75,16 @@ class CollegeBaseballScraper:
             return result
 
         # URL patterns to try for roster and stats
-        # Many SIDEARM sites use different path conventions
+        # Keep short for speed — CSV overrides handle special cases
         ROSTER_PATHS = [
             school.get('roster_url', '/sports/baseball/roster'),
-            '/sports/baseball/roster/2026',
-            '/sports/baseball/roster/2025-26',
             '/sports/baseball/roster',
-            '/sports/bsb/2025-26/roster',
-            '/sports/bsb/roster',
-            '/sports/mens-baseball/roster',
-            '/sports/m-basebl/roster/',    # WMT (Georgia Tech style)
-            '/sport/m-basebl/roster/',     # WMT singular (Arkansas style)
+            '/sports/baseball/roster/2026',
         ]
         STATS_PATHS = [
             school.get('stats_url', '/sports/baseball/stats'),
-            '/sports/baseball/stats/2026',
-            '/sports/baseball/stats/2025-26',
             '/sports/baseball/stats',
-            '/sports/bsb/2025-26/stats',
-            '/sports/bsb/stats',
-            '/sports/mens-baseball/stats',
-            '/sports/m-basebl/stats/',     # WMT (Georgia Tech style)
-            '/sport/m-basebl/stats/',      # WMT singular (Arkansas style)
+            '/sports/baseball/stats/2026',
         ]
         # Deduplicate while preserving order
         ROSTER_PATHS = list(dict.fromkeys(ROSTER_PATHS))
