@@ -2,11 +2,11 @@
 
 # Phase 1: Initial Scrape — different domain per school, so minimal delays
 INITIAL_SCRAPE_CONFIG = {
-    'between_requests': (2, 4),            # 2-4 seconds between requests
-    'between_pages_same_school': (1, 3),   # roster → stats on same domain
-    'between_schools': (3, 6),             # different domain, less delay needed
+    'between_requests': (0.5, 1.5),        # different domain each time — minimal delay
+    'between_pages_same_school': (1, 2),   # roster → stats on same domain
+    'between_schools': (1, 2),             # different domain, no courtesy needed
     'max_schools_per_day': 1000,           # DB checkpoint handles dedup; 6hr timeout is the real limit
-    'max_requests_per_hour': 600,
+    'max_requests_per_hour': 9999,         # no limit (cross-domain, logging only)
 }
 
 # Phase 2: Daily Updates

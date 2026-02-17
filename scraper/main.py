@@ -241,6 +241,7 @@ class CollegeBaseballScraper:
         max_schools = self.config.get('max_schools_per_day', 100)
         log_id = self.db.log_scrape_start()
         errors = []
+        run_start = datetime.now()
 
         try:
             for i, school in enumerate(schools):
@@ -261,10 +262,13 @@ class CollegeBaseballScraper:
                         errors.extend(result['errors'])
 
                     # Progress update
-                    if (i + 1) % 10 == 0:
+                    if (i + 1) % 5 == 0:
+                        elapsed = (datetime.now() - run_start).total_seconds() / 60
                         logger.info(f"Progress: {i + 1}/{len(schools)} schools processed "
-                                    f"({self.schools_scraped_today} successful, "
-                                    f"{self.total_players_scraped} players)")
+                                    f"({self.schools_scraped_today} saved, "
+                                    f"{self.total_players_scraped} players) "
+                                    f"[{elapsed:.0f}m elapsed, "
+                                    f"{self.request_handler.hourly_request_count} reqs]")
 
                     # Wait between schools
                     if i < len(schools) - 1:

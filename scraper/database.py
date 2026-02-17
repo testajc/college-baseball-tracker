@@ -25,7 +25,7 @@ class DatabaseManager:
 
     def _get_conn(self):
         if self.conn is None or self.conn.closed:
-            self.conn = psycopg2.connect(self.database_url)
+            self.conn = psycopg2.connect(self.database_url, connect_timeout=10)
             return self.conn
         # Test if connection is still alive
         try:
@@ -36,7 +36,7 @@ class DatabaseManager:
                 self.conn.close()
             except Exception:
                 pass
-            self.conn = psycopg2.connect(self.database_url)
+            self.conn = psycopg2.connect(self.database_url, connect_timeout=10)
         return self.conn
 
     def close(self):

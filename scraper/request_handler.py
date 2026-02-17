@@ -66,19 +66,17 @@ class ProtectedRequestHandler:
         return headers
 
     def _check_hourly_limit(self):
-        """Reset hourly counter if hour has passed, wait if limit reached"""
+        """Track hourly request count (logging only, no blocking).
+
+        Each school is a different domain, so a global hourly limit
+        is counterproductive — it causes 40+ minute stalls while
+        scraping hundreds of unrelated sites.
+        """
         now = datetime.now()
         if (now - self.hour_start).total_seconds() > 3600:
+            logger.info(f"Hourly stats: {self.hourly_request_count} requests in last hour")
             self.hourly_request_count = 0
             self.hour_start = now
-
-        max_per_hour = self.config.get('max_requests_per_hour', 200)
-        if self.hourly_request_count >= max_per_hour:
-            wait_seconds = 3600 - (now - self.hour_start).total_seconds() + 60
-            logger.warning(f"Hourly limit ({max_per_hour}) reached. Waiting {wait_seconds / 60:.1f} minutes...")
-            time.sleep(max(wait_seconds, 0))
-            self.hourly_request_count = 0
-            self.hour_start = datetime.now()
 
     def _wait_between_requests(self, delay_type: str = 'between_requests'):
         """Wait appropriate amount of time between requests"""
@@ -113,13 +111,14 @@ class ProtectedRequestHandler:
         return True
 
     def _check_circuit_breaker(self):
-        """Check if circuit breaker should trip"""
-        limit = self.error_config.get('consecutive_failures_limit', 5)
+        """Check if circuit breaker should trip.
+
+        No sleep — just log and reset.  Consecutive 429s from
+        *different* domains don't mean we're globally rate-limited.
+        """
+        limit = self.error_config.get('consecutive_failures_limit', 20)
         if self.consecutive_failures >= limit:
-            cooldown = self.error_config.get('circuit_breaker_cooldown', 1800)
-            logger.error(f"Circuit breaker triggered after {self.consecutive_failures} failures")
-            logger.info(f"Cooling down for {cooldown / 60:.1f} minutes...")
-            time.sleep(cooldown)
+            logger.warning(f"Circuit breaker: {self.consecutive_failures} consecutive failures (resetting)")
             self.consecutive_failures = 0
 
     def _check_pause(self):
