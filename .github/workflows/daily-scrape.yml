@@ -89,12 +89,25 @@ jobs:
           d1 = [x for x in remaining if x.get('division') == 'D1']
           d2 = [x for x in remaining if x.get('division') == 'D2']
           d3 = [x for x in remaining if x.get('division') == 'D3']
-          print(f'Teams in DB: {len(in_db)}')
-          print(f'Scheduler returned: {len(schools)}')
-          print(f'After DB checkpoint: {len(remaining)} (D1={len(d1)} D2={len(d2)} D3={len(d3)})')
-          print(f'First 10 to scrape: {[x[\"school_name\"]+\" (\"+x.get(\"division\",\"?\")+\")\" for x in remaining[:10]]}')
+          report = []
+          report.append(f'Teams in DB: {len(in_db)}')
+          report.append(f'Sample DB teams: {sorted(list(in_db))[:10]}')
+          report.append(f'Scheduler returned: {len(schools)}')
+          report.append(f'After DB checkpoint: {len(remaining)} (D1={len(d1)} D2={len(d2)} D3={len(d3)})')
+          report.append(f'First 20 to scrape: {[x[\"school_name\"]+\" (\"+x.get(\"division\",\"?\")+\")\" for x in remaining[:20]]}')
+          text = '\n'.join(report)
+          print(text)
+          open('/tmp/debug_checkpoint.txt', 'w').write(text)
           db.close()
           "
+
+      - name: Upload debug info
+        if: steps.season_check.outputs.skip != 'true' || github.event.inputs.force == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-checkpoint
+          path: /tmp/debug_checkpoint.txt
+          retention-days: 1
 
       - name: Run scraper
         if: steps.season_check.outputs.skip != 'true' || github.event.inputs.force == 'true'
