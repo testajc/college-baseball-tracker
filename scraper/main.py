@@ -207,7 +207,7 @@ class CollegeBaseballScraper:
 
         # Skip schools already scraped today (DB is the source of truth,
         # survives workflow cancellations unlike the JSON artifact)
-        already_done = self.db.get_schools_scraped_today()
+        already_done = self.db.get_schools_scraped_recently()
         if already_done:
             before = len(schools)
             schools = [s for s in schools if s['school_name'] not in already_done]

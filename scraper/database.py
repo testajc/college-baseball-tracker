@@ -384,11 +384,12 @@ class DatabaseManager:
             """, (status, teams_scraped, players_scraped, errors, log_id))
             conn.commit()
 
-    def get_schools_scraped_today(self) -> set:
-        """Return set of school names already scraped today (based on teams.updated_at)"""
+    def get_schools_scraped_recently(self) -> set:
+        """Return set of school names scraped in the last 18 hours.
+        Uses 18-hour window instead of CURRENT_DATE to handle cross-midnight runs."""
         conn = self._get_conn()
         with conn.cursor() as cur:
-            cur.execute("SELECT name FROM teams WHERE updated_at >= CURRENT_DATE")
+            cur.execute("SELECT name FROM teams WHERE updated_at >= NOW() - INTERVAL '18 hours'")
             return {row[0] for row in cur.fetchall()}
 
     def save_school_data(self, result: dict):
