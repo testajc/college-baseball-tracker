@@ -205,18 +205,20 @@ class CollegeBaseballScraper:
             logger.info("No schools need scraping today")
             return
 
-        # Skip schools already scraped today (DB is the source of truth,
-        # survives workflow cancellations unlike the JSON artifact)
-        already_done = self.db.get_schools_scraped_recently()
-        if already_done:
-            before = len(schools)
-            schools = [s for s in schools if s['school_name'] not in already_done]
-            skipped = before - len(schools)
-            if skipped:
-                logger.info(f"Skipping {skipped} schools already scraped today (DB checkpoint)")
+        # During initial scrape: skip schools already in the DB (survives
+        # workflow cancellations/timeouts unlike the JSON artifact).
+        # During daily updates: the scheduler handles rotation, no need to filter.
+        if not self.scheduler.is_initial_scrape_complete():
+            already_done = self.db.get_schools_in_db()
+            if already_done:
+                before = len(schools)
+                schools = [s for s in schools if s['school_name'] not in already_done]
+                skipped = before - len(schools)
+                if skipped:
+                    logger.info(f"Skipping {skipped} schools already in DB (initial scrape checkpoint)")
 
         if not schools:
-            logger.info("All schools already scraped today")
+            logger.info("All schools already scraped")
             return
 
         # Print status
