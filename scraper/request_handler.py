@@ -206,19 +206,19 @@ class ProtectedRequestHandler:
                 return None
 
             except requests.Timeout:
+                # Timeout is NOT a rate-limiting signal — it means this
+                # specific domain is slow.  Don't increment circuit breaker.
                 self.last_error_type = 'timeout'
                 logger.warning(f"Timeout for {url} (attempt {attempt + 1}/{max_retries})")
-                self.consecutive_failures += 1
                 if attempt < max_retries - 1:
-                    backoff = self.error_config.get('retry_delay_base', 60) * (attempt + 1)
-                    time.sleep(min(backoff, self.error_config.get('retry_delay_max', 3600)))
+                    backoff = self.error_config.get('retry_delay_base', 10) * (attempt + 1)
+                    time.sleep(min(backoff, self.error_config.get('retry_delay_max', 30)))
 
             except requests.RequestException as e:
+                # Generic request failure — don't increment circuit breaker.
+                # Only HTTP 429/403/503 (in _handle_error_response) should.
                 self.last_error_type = 'connection'
-                logger.error(f"Request failed for {url}: {e} (attempt {attempt + 1}/{max_retries})")
-                self.consecutive_failures += 1
-                if attempt < max_retries - 1:
-                    backoff = self.error_config.get('retry_delay_base', 60) * (attempt + 1)
-                    time.sleep(min(backoff, self.error_config.get('retry_delay_max', 3600)))
+                logger.error(f"Request failed for {url}: {e}")
+                return None
 
         return None
