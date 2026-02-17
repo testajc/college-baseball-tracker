@@ -38,6 +38,7 @@ class ProtectedRequestHandler:
         self.current_user_agent_index = 0
         self.is_paused = False
         self.pause_until = None
+        self.last_error_type = None  # 'connection', 'timeout', 'http', 'ssl'
 
     def _rotate_user_agent(self) -> str:
         """Rotate user agent periodically"""
@@ -147,6 +148,8 @@ class ProtectedRequestHandler:
     def get(self, url: str, delay_type: str = 'between_requests',
             referer: str = None) -> Optional[requests.Response]:
         """Make a GET request with full protection"""
+        self.last_error_type = None
+
         # Check pause status
         self._check_pause()
 
@@ -177,6 +180,7 @@ class ProtectedRequestHandler:
 
                 # Check for errors
                 if response.status_code != 200:
+                    self.last_error_type = 'http'
                     success = self._handle_error_response(response, url)
                     if not success:
                         return None
@@ -188,10 +192,21 @@ class ProtectedRequestHandler:
                 return response
 
             except requests.exceptions.SSLError as e:
+                self.last_error_type = 'ssl'
                 logger.warning(f"SSL error for {url} - skipping host")
                 return None
 
+            except requests.exceptions.ConnectionError as e:
+                # Domain is unreachable (DNS failure, refused, reset, etc.)
+                # This is NOT a rate-limiting signal — don't retry, don't
+                # increment the circuit breaker.  The caller should skip
+                # remaining URL paths for this domain.
+                self.last_error_type = 'connection'
+                logger.warning(f"Connection error for {url} - domain unreachable")
+                return None
+
             except requests.Timeout:
+                self.last_error_type = 'timeout'
                 logger.warning(f"Timeout for {url} (attempt {attempt + 1}/{max_retries})")
                 self.consecutive_failures += 1
                 if attempt < max_retries - 1:
@@ -199,6 +214,7 @@ class ProtectedRequestHandler:
                     time.sleep(min(backoff, self.error_config.get('retry_delay_max', 3600)))
 
             except requests.RequestException as e:
+                self.last_error_type = 'connection'
                 logger.error(f"Request failed for {url}: {e} (attempt {attempt + 1}/{max_retries})")
                 self.consecutive_failures += 1
                 if attempt < max_retries - 1:

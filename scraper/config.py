@@ -23,8 +23,8 @@ ERROR_CONFIG = {
     'retry_delay_base': 60,
     'retry_delay_max': 3600,
     'max_retries': 3,
-    'consecutive_failures_limit': 5,
-    'circuit_breaker_cooldown': 1800,      # 30 minutes
+    'consecutive_failures_limit': 10,
+    'circuit_breaker_cooldown': 600,       # 10 minutes (was 30 — dead domains no longer trip it)
 }
 
 # Stop signals - if we see these, pause immediately

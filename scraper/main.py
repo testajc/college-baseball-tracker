@@ -113,9 +113,13 @@ class CollegeBaseballScraper:
                 response = resp
                 roster_url = url
                 break
+            # Domain is completely unreachable — don't waste time on more paths
+            if self.request_handler.last_error_type in ('connection', 'ssl'):
+                logger.info(f"  Domain unreachable, skipping remaining roster paths")
+                break
 
         if not response:
-            result['errors'].append(f"Failed to fetch roster from {base_url} (tried {len(ROSTER_PATHS)} paths)")
+            result['errors'].append(f"Failed to fetch roster from {base_url} (tried paths)")
             return result
 
         roster = self.parser.parse_roster(response.text, school_name)
@@ -145,6 +149,10 @@ class CollegeBaseballScraper:
                     logger.debug(f"  Redirected to homepage, skipping: {url}")
                     continue
                 stats_response = resp
+                break
+            # Domain unreachable — skip remaining stats paths
+            if self.request_handler.last_error_type in ('connection', 'ssl'):
+                logger.info(f"  Domain unreachable, skipping remaining stats paths")
                 break
 
         batting_stats = {}
