@@ -180,8 +180,31 @@ class ProtectedRequestHandler:
 
             except requests.exceptions.SSLError as e:
                 self.last_error_type = 'ssl'
-                logger.warning(f"SSL error for {url} - skipping host")
-                return None
+                # Retry once with verify=False (recovers expired/misconfigured certs)
+                try:
+                    logger.warning(f"SSL error for {url} - retrying without verification")
+                    response = self.session.get(
+                        url,
+                        headers=self._get_headers(referer),
+                        timeout=15,
+                        allow_redirects=True,
+                        verify=False
+                    )
+                    self.last_request_time = datetime.now()
+                    self.request_count += 1
+                    self.hourly_request_count += 1
+
+                    if response.status_code == 200:
+                        self.consecutive_failures = 0
+                        logger.info(f"SSL bypass OK for {url} (insecure)")
+                        return response
+                    else:
+                        self.last_error_type = 'http'
+                        self._handle_error_response(response, url)
+                        return None
+                except Exception:
+                    logger.warning(f"SSL bypass also failed for {url} - skipping host")
+                    return None
 
             except requests.exceptions.ConnectionError as e:
                 # Domain is unreachable (DNS failure, refused, reset, etc.)

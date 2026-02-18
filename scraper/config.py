@@ -30,5 +30,11 @@ ERROR_CONFIG = {
 # Stop signals - only 429 triggers a pause (actual rate limiting)
 STOP_SIGNALS = [429]
 
+# Browser scraping (Playwright headless Chromium)
+BROWSER_CONFIG = {
+    'page_load_timeout': 15000,   # ms — max wait for JS rendering
+    'max_schools_per_run': 50,    # limit browser-based scraping per run
+}
+
 # Season start date - D1 opening weekend is mid-February 2026
 SEASON_START_DATE = '2026-02-14'

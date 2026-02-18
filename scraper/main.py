@@ -8,11 +8,13 @@ import sys
 from datetime import datetime, date
 from pathlib import Path
 
-from config import INITIAL_SCRAPE_CONFIG, DAILY_UPDATE_CONFIG, ERROR_CONFIG, SEASON_START_DATE
+from config import INITIAL_SCRAPE_CONFIG, DAILY_UPDATE_CONFIG, ERROR_CONFIG, SEASON_START_DATE, BROWSER_CONFIG
 from scheduler import SmartScheduler
 from request_handler import ProtectedRequestHandler
 from parsers.sidearm_parser import SidearmParser
 from database import DatabaseManager
+from url_discovery import UrlDiscoverer
+from browser_scraper import BrowserScraper
 
 logging.basicConfig(
     level=logging.INFO,
@@ -32,6 +34,8 @@ class CollegeBaseballScraper:
         self.request_handler = ProtectedRequestHandler(self.config, ERROR_CONFIG)
         self.parser = SidearmParser()
         self.db = DatabaseManager()
+        self.url_discoverer = UrlDiscoverer()
+        self.browser_scraper = BrowserScraper(self.parser, BROWSER_CONFIG)
         self.schools_scraped_today = 0
         self.total_players_scraped = 0
 
@@ -75,16 +79,32 @@ class CollegeBaseballScraper:
             return result
 
         # URL patterns to try for roster and stats
-        # Keep short for speed — CSV overrides handle special cases
+        # SIDEARM standard paths first, then PrestoSports / non-SIDEARM fallbacks
         ROSTER_PATHS = [
             school.get('roster_url', '/sports/baseball/roster'),
             '/sports/baseball/roster',
             '/sports/baseball/roster/2026',
+            # PrestoSports / non-SIDEARM patterns
+            '/sport/m-basebl/roster',
+            '/sports/bsb/roster',
+            '/sports/mens-baseball/roster',
+            '/teams/baseball/roster',
+            '/roster.aspx?path=baseball',
+            '/athletics/baseball/roster',
+            '/baseball/roster/',
         ]
         STATS_PATHS = [
             school.get('stats_url', '/sports/baseball/stats'),
             '/sports/baseball/stats',
             '/sports/baseball/stats/2026',
+            # PrestoSports / non-SIDEARM patterns
+            '/sport/m-basebl/stats',
+            '/sports/bsb/stats',
+            '/sports/mens-baseball/stats',
+            '/teams/baseball/stats',
+            '/teamstats.aspx?path=baseball',
+            '/athletics/baseball/stats',
+            '/baseball/stats/',
         ]
         # Deduplicate while preserving order
         ROSTER_PATHS = list(dict.fromkeys(ROSTER_PATHS))
@@ -113,6 +133,20 @@ class CollegeBaseballScraper:
                 logger.info(f"  Domain down/timeout, skipping remaining roster paths")
                 break
 
+        # URL discovery fallback: if all paths returned 404/405 (site is up,
+        # just wrong paths), crawl the homepage to find the right URLs
+        if not response and self.request_handler.last_error_type == 'http':
+            discovered = self.url_discoverer.discover_baseball_urls(base_url, self.request_handler)
+            if discovered and discovered.get('roster_url'):
+                resp = self.request_handler.get(discovered['roster_url'])
+                if resp:
+                    response = resp
+                    roster_url = discovered['roster_url']
+                    # Also update stats paths if discovered
+                    if discovered.get('stats_url'):
+                        STATS_PATHS.insert(0, discovered['stats_url'])
+                        STATS_PATHS = list(dict.fromkeys(STATS_PATHS))
+
         if not response:
             result['errors'].append(f"Failed to fetch roster from {base_url}")
             return result
@@ -122,6 +156,7 @@ class CollegeBaseballScraper:
 
         if not roster:
             result['errors'].append("No players parsed from roster page")
+            result['found_0_players'] = True  # Flag for browser retry
             return result  # No point fetching stats if roster is empty
 
         # Wait before stats request
@@ -164,6 +199,12 @@ class CollegeBaseballScraper:
                 batting_stats = self.parser.parse_batting_stats(response.text)
             if not pitching_stats:
                 pitching_stats = self.parser.parse_pitching_stats(response.text)
+
+            # Generic stats fallback for non-SIDEARM sites
+            if not batting_stats:
+                batting_stats = self.parser.parse_generic_batting_stats(response.text)
+            if not pitching_stats:
+                pitching_stats = self.parser.parse_generic_pitching_stats(response.text)
 
             logger.info(f"  Batting stats: {len(batting_stats)} players")
             logger.info(f"  Pitching stats: {len(pitching_stats)} players")
@@ -241,6 +282,7 @@ class CollegeBaseballScraper:
         max_schools = self.config.get('max_schools_per_day', 100)
         log_id = self.db.log_scrape_start()
         errors = []
+        browser_retry_schools = []
         run_start = datetime.now()
 
         try:
@@ -257,6 +299,9 @@ class CollegeBaseballScraper:
                         self.scheduler.mark_scraped(school['school_name'])
                         self.schools_scraped_today += 1
                         self.total_players_scraped += players_saved
+                    elif result.get('found_0_players'):
+                        # Site was reachable but parser couldn't read — candidate for browser retry
+                        browser_retry_schools.append(school)
 
                     if result['errors']:
                         errors.extend(result['errors'])
@@ -282,6 +327,21 @@ class CollegeBaseballScraper:
                     logger.error(f"Error scraping {school['school_name']}: {e}")
                     errors.append(f"{school['school_name']}: {str(e)}")
                     continue
+
+            # Browser retry pass for schools that returned 0 players
+            if browser_retry_schools and self.browser_scraper.available:
+                logger.info(f"Browser retry pass: {len(browser_retry_schools)} schools")
+                browser_results = self.browser_scraper.scrape_schools(browser_retry_schools)
+                for result in browser_results:
+                    if result['success']:
+                        players_saved = self.db.save_school_data(result)
+                        self.scheduler.mark_scraped(result['school'])
+                        self.schools_scraped_today += 1
+                        self.total_players_scraped += players_saved
+                        logger.info(f"  Browser recovered: {result['school']} ({players_saved} players)")
+            elif browser_retry_schools:
+                logger.info(f"Skipping browser retry ({len(browser_retry_schools)} candidates) — "
+                           "Playwright not installed")
 
         finally:
             self.db.log_scrape_end(
@@ -396,6 +456,98 @@ class CollegeBaseballScraper:
         print("=" * 60)
 
 
+    def run_recover(self, dry_run: bool = False):
+        """Re-attempt scraping on schools that previously failed.
+
+        Targets schools that are in the scheduler's history as "scraped" but
+        have no players in the DB, or schools that were never scraped due to
+        errors (not in DB at all despite being in scrape_history).
+        """
+        logger.info("Recovery mode: finding failed schools to retry")
+
+        all_schools = self.scheduler.schools
+        already_in_db = self.db.get_schools_in_db()
+
+        # Find schools not in DB (either never scraped or scraped with 0 players)
+        failed_schools = [s for s in all_schools if s['school_name'] not in already_in_db]
+
+        if not failed_schools:
+            logger.info("No failed schools to recover — all schools are in DB")
+            return
+
+        logger.info(f"Found {len(failed_schools)} schools not in DB")
+
+        if dry_run:
+            logger.info("DRY RUN - would attempt recovery on:")
+            for s in failed_schools[:30]:
+                logger.info(f"  {s['school_name']} ({s.get('division', '?')}) - {s.get('athletics_base_url', 'no URL')}")
+            if len(failed_schools) > 30:
+                logger.info(f"  ... and {len(failed_schools) - 30} more")
+            return
+
+        log_id = self.db.log_scrape_start()
+        errors = []
+        browser_retry_schools = []
+        run_start = datetime.now()
+
+        try:
+            for i, school in enumerate(failed_schools):
+                try:
+                    result = self.scrape_school(school)
+
+                    if result['success']:
+                        players_saved = self.db.save_school_data(result)
+                        self.scheduler.mark_scraped(school['school_name'])
+                        self.schools_scraped_today += 1
+                        self.total_players_scraped += players_saved
+                        logger.info(f"  Recovered: {school['school_name']} ({players_saved} players)")
+                    elif result.get('found_0_players'):
+                        browser_retry_schools.append(school)
+
+                    if result['errors']:
+                        errors.extend(result['errors'])
+
+                    if (i + 1) % 5 == 0:
+                        elapsed = (datetime.now() - run_start).total_seconds() / 60
+                        logger.info(f"Recovery progress: {i + 1}/{len(failed_schools)} "
+                                    f"({self.schools_scraped_today} recovered) [{elapsed:.0f}m]")
+
+                    if i < len(failed_schools) - 1:
+                        delay = random.uniform(*self.config['between_schools'])
+                        time.sleep(delay)
+
+                except KeyboardInterrupt:
+                    logger.warning("Interrupted by user")
+                    break
+                except Exception as e:
+                    logger.error(f"Recovery error for {school['school_name']}: {e}")
+                    errors.append(f"{school['school_name']}: {str(e)}")
+                    continue
+
+            # Browser retry pass
+            if browser_retry_schools and self.browser_scraper.available:
+                logger.info(f"Browser retry pass: {len(browser_retry_schools)} schools")
+                browser_results = self.browser_scraper.scrape_schools(browser_retry_schools)
+                for result in browser_results:
+                    if result['success']:
+                        players_saved = self.db.save_school_data(result)
+                        self.scheduler.mark_scraped(result['school'])
+                        self.schools_scraped_today += 1
+                        self.total_players_scraped += players_saved
+
+        finally:
+            self.db.log_scrape_end(
+                log_id,
+                self.schools_scraped_today,
+                self.total_players_scraped,
+                errors[:50],
+                success=self.schools_scraped_today > 0
+            )
+            self.db.close()
+
+        logger.info(f"Recovery complete. Recovered: {self.schools_scraped_today} schools, "
+                    f"{self.total_players_scraped} players")
+
     def run_cleanup(self):
         """Delete players with invalid names (stat values as names)"""
         import psycopg2
@@ -444,8 +596,9 @@ class CollegeBaseballScraper:
 
 def main():
     parser = argparse.ArgumentParser(description='College Baseball Stats Scraper')
-    parser.add_argument('command', choices=['run', 'diagnostic', 'status', 'cleanup'],
-                        help='run=daily scrape, diagnostic=test schools, status=show progress, cleanup=fix bad data')
+    parser.add_argument('command', choices=['run', 'diagnostic', 'status', 'cleanup', 'recover'],
+                        help='run=daily scrape, diagnostic=test schools, status=show progress, '
+                             'cleanup=fix bad data, recover=retry failed schools')
     parser.add_argument('--force', '-f', action='store_true',
                         help='Force scrape even if season has not started')
     parser.add_argument('--dry-run', action='store_true',
@@ -463,6 +616,8 @@ def main():
         print(scraper.scheduler.get_status_report())
     elif args.command == 'cleanup':
         scraper.run_cleanup()
+    elif args.command == 'recover':
+        scraper.run_recover(dry_run=args.dry_run)
 
 
 if __name__ == '__main__':

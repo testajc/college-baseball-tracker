@@ -75,6 +75,12 @@ class SidearmParser:
             if players:
                 logger.debug(f"Found {len(players)} players via JSON-LD")
 
+        # Strategy 5: Generic roster detection for non-SIDEARM sites
+        if not players:
+            players = self._parse_generic_roster(soup)
+            if players:
+                logger.debug(f"Found {len(players)} players via generic roster parser")
+
         # Sanity check: a baseball roster should have 15-55 players
         if len(players) > 60:
             logger.warning(f"Roster has {len(players)} players (unusually large), may include non-players")
@@ -309,6 +315,234 @@ class SidearmParser:
                 players.append(player)
 
         return players
+
+    # ── Generic parsers (non-SIDEARM fallback) ──────────────────────
+
+    def _parse_generic_roster(self, soup) -> List[Dict]:
+        """
+        Strategy 5: Generic roster parser for non-SIDEARM sites.
+        Scores all tables by how "roster-like" they are and parses the best one.
+        Also tries non-table layouts (repeating div/li patterns).
+        """
+        # Score all tables
+        tables = soup.find_all('table')
+        scored_tables = []
+
+        for table in tables:
+            score = 0
+            headers = []
+
+            thead = table.find('thead')
+            if thead:
+                headers = [th.get_text(strip=True).lower() for th in thead.find_all(['th', 'td'])]
+            else:
+                first_row = table.find('tr')
+                if first_row:
+                    headers = [c.get_text(strip=True).lower() for c in first_row.find_all(['th', 'td'])]
+
+            headers_lower = [h.replace('.', '').replace('#', 'no').strip() for h in headers]
+
+            # Positive signals
+            if any(h in ('name', 'player') or 'name' in h for h in headers_lower):
+                score += 3
+            if any(h in ('pos', 'position') for h in headers_lower):
+                score += 2
+            if any(h in ('yr', 'cl', 'class', 'year', 'elig') for h in headers_lower):
+                score += 2
+            if any(h in ('no', 'number', 'num') for h in headers_lower):
+                score += 1
+            if any(h in ('ht', 'height') for h in headers_lower):
+                score += 1
+            if any(h in ('wt', 'weight') for h in headers_lower):
+                score += 1
+            if any(h in ('hometown', 'high school', 'hs') for h in headers_lower):
+                score += 1
+
+            # Row count bonus (baseball rosters typically 15-55 players)
+            rows = table.find_all('tr')
+            row_count = len(rows) - 1  # subtract header
+            if 15 <= row_count <= 55:
+                score += 1
+
+            # Negative signals: this is a schedule, standings, or stats table
+            if any(h in ('schedule', 'date', 'opponent', 'opp', 'location', 'result',
+                         'avg', 'era', 'ab', 'ip', 'rbi', 'w-l')
+                   for h in headers_lower):
+                score -= 5
+
+            if score >= 5:
+                scored_tables.append((score, table))
+
+        # Parse the highest-scoring table
+        if scored_tables:
+            scored_tables.sort(key=lambda x: -x[0])
+            best_table = scored_tables[0][1]
+            players = self._parse_table_roster(best_table)
+            if players:
+                return players
+
+        # Non-table fallback: look for repeating div/li patterns
+        players = self._parse_repeating_elements_roster(soup)
+        return players
+
+    def _parse_repeating_elements_roster(self, soup) -> List[Dict]:
+        """
+        Parse non-table roster layouts where players are in repeating
+        div or li elements with the same class structure.
+        """
+        # Look for containers that have many similar children
+        candidates = []
+
+        for container_tag in ['ul', 'ol', 'div', 'section']:
+            for container in soup.find_all(container_tag):
+                children = container.find_all(recursive=False)
+                if len(children) < 10:
+                    continue
+
+                # Check if children share common class patterns
+                class_counter = {}
+                for child in children:
+                    cls = tuple(sorted(child.get('class', [])))
+                    if cls:
+                        class_counter[cls] = class_counter.get(cls, 0) + 1
+
+                # Need at least 10 siblings with the same class (roster-sized)
+                for cls, count in class_counter.items():
+                    if count >= 10:
+                        matching = [c for c in children
+                                    if tuple(sorted(c.get('class', []))) == cls]
+                        candidates.append((count, matching))
+
+        if not candidates:
+            return []
+
+        # Try the largest group of matching elements
+        candidates.sort(key=lambda x: -x[0])
+        elements = candidates[0][1]
+
+        players = []
+        for elem in elements:
+            player = self._extract_player_from_element(elem)
+            if player and player.get('name'):
+                players.append(player)
+
+        # Only return if it looks roster-sized
+        if len(players) >= 10:
+            return players
+        return []
+
+    def _extract_player_from_element(self, elem) -> Optional[Dict]:
+        """Extract player data from a generic HTML element."""
+        player = {}
+
+        # Try to find name: headings, links with name-like content
+        for tag in ['h3', 'h4', 'h2', 'h5', 'a']:
+            name_elem = elem.find(tag)
+            if name_elem:
+                text = name_elem.get_text(strip=True)
+                # Must look like a name (2+ words, not a number)
+                if text and ' ' in text and not re.match(r'^[\d.\-/]+$', text):
+                    player['name'] = re.sub(r'\s+', ' ', text).strip()
+                    break
+
+        if not player.get('name'):
+            return None
+
+        # Extract other fields from text content
+        all_text = elem.get_text(' ', strip=True)
+
+        # Position (common baseball positions)
+        pos_match = re.search(
+            r'\b(RHP|LHP|P|C|1B|2B|3B|SS|LF|CF|RF|OF|DH|INF|IF|UT|UTIL)\b',
+            all_text
+        )
+        if pos_match:
+            player['position'] = pos_match.group(1)
+
+        # Class year
+        yr_match = re.search(
+            r'\b(Fr\.|So\.|Jr\.|Sr\.|Gr\.|Freshman|Sophomore|Junior|Senior|Graduate|R-Fr\.|R-So\.|R-Jr\.|R-Sr\.)\b',
+            all_text, re.I
+        )
+        if yr_match:
+            player['class_year'] = yr_match.group(1)
+
+        # Height (e.g., 6-2, 5-11, 6'2")
+        ht_match = re.search(r'\b(\d)[\'′\-](\d{1,2})[\"″]?\b', all_text)
+        if ht_match:
+            player['height'] = f"{ht_match.group(1)}-{ht_match.group(2)}"
+
+        # Weight (3-digit number near height context)
+        wt_match = re.search(r'\b(1[5-9]\d|2[0-9]\d|3[0-3]\d)\s*(?:lbs?\.?)?\b', all_text)
+        if wt_match:
+            player['weight'] = wt_match.group(1)
+
+        # Bats/Throws
+        bt_match = re.search(r'\b([RLS])\s*/\s*([RLS])\b', all_text, re.I)
+        if bt_match:
+            player['bats_throws'] = f"{bt_match.group(1).upper()}/{bt_match.group(2).upper()}"
+
+        return player
+
+    def parse_generic_batting_stats(self, html: str) -> Dict[str, Dict]:
+        """
+        Parse batting stats from non-SIDEARM pages by scoring tables.
+        Falls back when standard batting table detection fails.
+        """
+        soup = BeautifulSoup(html, 'html.parser')
+        return self._find_and_parse_generic_stats(soup, 'batting')
+
+    def parse_generic_pitching_stats(self, html: str) -> Dict[str, Dict]:
+        """
+        Parse pitching stats from non-SIDEARM pages by scoring tables.
+        Falls back when standard pitching table detection fails.
+        """
+        soup = BeautifulSoup(html, 'html.parser')
+        return self._find_and_parse_generic_stats(soup, 'pitching')
+
+    def _find_and_parse_generic_stats(self, soup, stat_type: str) -> Dict[str, Dict]:
+        """
+        Score all tables for how likely they are to contain batting/pitching stats.
+        """
+        tables = soup.find_all('table')
+        scored_tables = []
+
+        batting_indicators = {'avg', 'ab', 'hr', 'rbi', 'obp', 'slg', 'ops', 'h', 'r', 'bb'}
+        pitching_indicators = {'era', 'ip', 'w', 'sv', 'whip', 'so', 'er', 'gs', 'bb'}
+
+        indicators = batting_indicators if stat_type == 'batting' else pitching_indicators
+
+        for table in tables:
+            headers = []
+            thead = table.find('thead')
+            if thead:
+                headers = [th.get_text(strip=True).lower().replace('.', '').replace('%', '')
+                           for th in thead.find_all(['th', 'td'])]
+            else:
+                first_row = table.find('tr')
+                if first_row:
+                    headers = [c.get_text(strip=True).lower().replace('.', '').replace('%', '')
+                               for c in first_row.find_all(['th', 'td'])]
+
+            headers_set = set(headers)
+            matches = len(headers_set & indicators)
+
+            if matches >= 3:
+                # Disambiguate: batting tables have 'avg'/'rbi', pitching have 'era'/'ip'
+                if stat_type == 'batting' and 'era' in headers_set:
+                    continue  # This is a pitching table
+                if stat_type == 'pitching' and ('avg' in headers_set or 'rbi' in headers_set):
+                    if 'era' not in headers_set:
+                        continue  # This is a batting table
+
+                scored_tables.append((matches, table))
+
+        if not scored_tables:
+            return {}
+
+        scored_tables.sort(key=lambda x: -x[0])
+        best_table = scored_tables[0][1]
+        return self._parse_stats_table(best_table, stat_type)
 
     # ── Nuxt payload parser (SIDEARM v3) ─────────────────────────────
 
