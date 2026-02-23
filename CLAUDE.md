@@ -168,10 +168,12 @@ Homepage redirects (301 → base URL) are detected and skipped.
 ### Recovery Strategies
 
 When standard URL paths fail, the scraper has a multi-layer recovery pipeline:
-1. **URL discovery** - When all paths return 404/405, crawls the athletics homepage to find correct baseball URLs (homepage links → baseball landing page → sitemap.xml)
+1. **URL discovery** - When all paths return 404/405, crawls the athletics homepage to find correct baseball URLs (homepage links → baseball landing page → sitemap.xml). Supports cross-domain stats links (e.g., `data.clemsontigers.com`)
 2. **Generic parsers** - Table-scoring algorithm for non-SIDEARM HTML (both roster and stats)
-3. **SSL bypass** - Retries with `verify=False` when SSL errors occur (recovers expired certs)
-4. **Browser fallback** - Playwright headless Chromium renders JS-heavy pages (requires `playwright` install)
+3. **SIDEARM API fallback** - Tries JSON API endpoints (`/services/responsive-calendar.ashx`, `/api/stats/baseball`) for Nuxt SPA sites where stats are client-side only
+4. **SSL bypass** - Retries with `verify=False` when SSL errors occur (recovers expired certs)
+5. **Browser fallback** - Playwright headless Chromium renders JS-heavy pages (requires `playwright` install)
+6. **Stale player cleanup** - After each school scrape, removes players no longer on the current roster (with safety guard: skips cleanup if scraper got 0 players)
 
 ### Diagnostic Results (Feb 17, 2026)
 
@@ -224,6 +226,7 @@ Daily scrape runs via `.github/workflows/daily-scrape.yml`:
 - **~128 unreachable schools** - Dead domains (DNS failure, connection refused), sites returning 403 on all paths, or non-standard JS-rendered sites with 0 parseable players. Mostly D2/D3 schools that have folded or changed hosting. Conference URL discovery recovered 106 of the original ~254.
 - **~23 corrected-but-still-failing** - URLs found via conference sites but roster pages return 0 players (JS-rendered content or non-standard URL paths). Would benefit from Playwright.
 - **~14 JS-rendered sites** - Sites reachable but returning 0 players (content rendered client-side). Would be recovered by installing Playwright (`pip install playwright && playwright install chromium`) — the browser fallback is implemented but requires the dependency.
+- **Nuxt SPA stats (Iowa, BYU, Nebraska, Colorado, Iowa St.)** - Stats loaded client-side only; Nuxt payload doesn't contain `individualHittingStats`. SIDEARM API fallback added but may not work for all sites — Playwright is the definitive fix.
 - **Vanderbilt / WMT Games sites** - Some schools use WordPress + WMT Games plugin where stats are JS iframes from `wmt.games`. Roster works, stats return 0.
 - **Pitching on older SIDEARM** - HTML table parser gets pitching fine on D3 sites. D1 SIDEARM v3 only server-renders batting HTML, but the Nuxt parser handles pitching.
 
@@ -246,6 +249,12 @@ Daily scrape runs via `.github/workflows/daily-scrape.yml`:
 Note: Team count exceeds CSV total because some schools have multiple entries or were added via redirect domains. The ~128 remaining missing schools are dead domains not recoverable from conference sites. ~23 have corrected URLs but need Playwright for JS-rendered rosters.
 
 ## Recent Changes
+
+### Session 6 (Feb 23, 2026) - Stale Players, Cross-Domain Stats, SIDEARM API
+1. **Stale player cleanup** in `database.py` - `save_school_data()` now tracks upserted player IDs and deletes players no longer on the current roster via `_cleanup_stale_players()`. Cleans `email_notifications` (no CASCADE) then players (CASCADE handles stats, favorites, portal_alerts). Safety guard: skips cleanup if scraper returns 0 players.
+2. **Cross-domain stats URL discovery** in `url_discovery.py` - Added `_is_related_domain()` to allow stats links from subdomains (e.g., `data.clemsontigers.com` from `clemsontigers.com`). Roster discovery remains same-domain only.
+3. **SIDEARM API stats fallback** in `main.py` - After all HTML parsers fail, tries SIDEARM API endpoints (`/services/responsive-calendar.ashx?type=stats&sport=baseball`, `/api/stats/baseball`). Handles both JSON and HTML+Nuxt responses.
+4. **`parse_sidearm_api_stats()`** in `sidearm_parser.py` - New parser for JSON API responses with flexible key matching for various SIDEARM API formats.
 
 ### Session 5 (Feb 23, 2026) - Conference URL Discovery
 1. **`validate_schools.py`** (new) - School classification + conference URL discovery tool:
@@ -315,6 +324,7 @@ Note: Team count exceeds CSV total because some schools have multiple entries or
 ## Git History (Recent)
 
 ```
+15cf576 Fix stale players, cross-domain stats discovery, and SIDEARM API fallback
 29b9d25 Update 106 school URLs from conference website discovery
 1b61243 Add scraper recovery for failed schools: URL discovery, generic parsers, browser fallback
 7de822e Add force-dynamic to debug API route (fix cached GET response)
