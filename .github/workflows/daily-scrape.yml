@@ -64,6 +64,35 @@ jobs:
           path: scraper/
         continue-on-error: true
 
+      - name: Seed scrape history from DB if artifact missing
+        if: steps.season_check.outputs.skip != 'true' || github.event.inputs.force == 'true'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          cd scraper
+          if [ ! -f scrape_history.json ]; then
+            echo "scrape_history.json missing (artifact expired?) — seeding from DB"
+            python -c "
+          import json
+          from database import DatabaseManager
+          db = DatabaseManager()
+          teams = db.get_schools_in_db()
+          db.close()
+          if teams:
+              history = {
+                  'initial_scrape_complete': True,
+                  'last_scraped': {name: '2026-02-22' for name in teams}
+              }
+              with open('scrape_history.json', 'w') as f:
+                  json.dump(history, f, indent=2)
+              print(f'Seeded scrape_history.json with {len(teams)} teams from DB')
+          else:
+              print('DB has no teams — starting fresh initial scrape')
+          "
+          else
+            echo "scrape_history.json exists ($(wc -l < scrape_history.json) lines)"
+          fi
+
       - name: Clean up bad data
         if: steps.season_check.outputs.skip != 'true' || github.event.inputs.force == 'true'
         env:
