@@ -211,6 +211,17 @@ class CollegeBaseballScraper:
         else:
             result['errors'].append(f"Failed to fetch stats from {base_url} (tried {len(STATS_PATHS)} paths)")
 
+        # SIDEARM API fallback: for Nuxt SPA sites where stats are loaded
+        # client-side only (e.g., Iowa, BYU, Nebraska, Colorado)
+        if not batting_stats and not pitching_stats:
+            api_batting, api_pitching = self._try_sidearm_api_stats(base_url, roster_url)
+            if api_batting:
+                batting_stats = api_batting
+            if api_pitching:
+                pitching_stats = api_pitching
+            if api_batting or api_pitching:
+                logger.info(f"  SIDEARM API: {len(batting_stats)} batting, {len(pitching_stats)} pitching")
+
         # Merge data
         for player in roster:
             player_name = player.get('name', '')
@@ -237,6 +248,46 @@ class CollegeBaseballScraper:
             logger.warning(f"  Failed: No players found")
 
         return result
+
+    def _try_sidearm_api_stats(self, base_url: str, referer: str = None):
+        """Try SIDEARM API endpoints as a fallback for Nuxt SPA sites
+        where stats are only loaded client-side."""
+        SIDEARM_API_PATHS = [
+            '/services/responsive-calendar.ashx?type=stats&sport=baseball&year=2026',
+            '/services/responsive-calendar.ashx?type=stats&sport=baseball',
+            '/api/stats/baseball',
+        ]
+
+        for path in SIDEARM_API_PATHS:
+            url = f"{base_url}{path}"
+            logger.debug(f"Trying SIDEARM API: {url}")
+            resp = self.request_handler.get(
+                url,
+                delay_type='between_pages_same_school',
+                referer=referer
+            )
+            if not resp:
+                continue
+
+            # Check if we got JSON back
+            content_type = resp.headers.get('content-type', '')
+            if 'json' in content_type or 'javascript' in content_type:
+                try:
+                    data = resp.json()
+                    batting, pitching = self.parser.parse_sidearm_api_stats(data)
+                    if batting or pitching:
+                        return batting, pitching
+                except Exception as e:
+                    logger.debug(f"  SIDEARM API parse error: {e}")
+                    continue
+
+            # Some API endpoints return HTML with embedded Nuxt data
+            if resp.text:
+                batting, pitching = self.parser.parse_nuxt_stats(resp.text)
+                if batting or pitching:
+                    return batting, pitching
+
+        return {}, {}
 
     def run(self, force: bool = False, dry_run: bool = False):
         """Main run method - handles both initial and daily scraping"""

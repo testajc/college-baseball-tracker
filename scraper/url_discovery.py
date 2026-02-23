@@ -16,6 +16,19 @@ class UrlDiscoverer:
     Used as a fallback when standard SIDEARM URL patterns return 404/405.
     """
 
+    @staticmethod
+    def _is_related_domain(link_domain: str, base_domain: str) -> bool:
+        """Check if a link domain is the same or a subdomain/sibling of the base domain.
+        e.g., data.clemsontigers.com is related to clemsontigers.com"""
+        if link_domain == base_domain:
+            return True
+        # Extract root domain (last 2 parts): data.clemsontigers.com -> clemsontigers.com
+        base_parts = base_domain.rsplit('.', 2)
+        link_parts = link_domain.rsplit('.', 2)
+        base_root = '.'.join(base_parts[-2:]) if len(base_parts) >= 2 else base_domain
+        link_root = '.'.join(link_parts[-2:]) if len(link_parts) >= 2 else link_domain
+        return link_root == base_root
+
     # Patterns that indicate a baseball roster page
     ROSTER_PATTERNS = [
         re.compile(r'baseball.*roster', re.I),
@@ -103,22 +116,23 @@ class UrlDiscoverer:
         for link in links:
             href = link['href']
             full_url = urljoin(page_url, href)
+            link_domain = urlparse(full_url).netloc
 
-            # Only consider same-domain links
-            if urlparse(full_url).netloc != base_domain:
-                continue
+            # Roster: same-domain only
+            if link_domain == base_domain:
+                for pattern in self.ROSTER_PATTERNS:
+                    if pattern.search(href) or pattern.search(link.get_text()):
+                        if not roster_url:
+                            roster_url = full_url
+                        break
 
-            for pattern in self.ROSTER_PATTERNS:
-                if pattern.search(href) or pattern.search(link.get_text()):
-                    if not roster_url:
-                        roster_url = full_url
-                    break
-
-            for pattern in self.STATS_PATTERNS:
-                if pattern.search(href) or pattern.search(link.get_text()):
-                    if not stats_url:
-                        stats_url = full_url
-                    break
+            # Stats: allow related domains (e.g., data.clemsontigers.com)
+            if self._is_related_domain(link_domain, base_domain):
+                for pattern in self.STATS_PATTERNS:
+                    if pattern.search(href) or pattern.search(link.get_text()):
+                        if not stats_url:
+                            stats_url = full_url
+                        break
 
             if roster_url and stats_url:
                 break
@@ -183,17 +197,15 @@ class UrlDiscoverer:
             href = link['href']
             full_url = urljoin(page_url, href)
             text = link.get_text(strip=True).lower()
+            link_domain = urlparse(full_url).netloc
 
-            if urlparse(full_url).netloc != base_domain:
-                continue
-
-            # Look for roster link
-            if not roster_url:
+            # Look for roster link (same-domain only)
+            if not roster_url and link_domain == base_domain:
                 if re.search(r'\broster\b', href, re.I) or re.search(r'\broster\b', text, re.I):
                     roster_url = full_url
 
-            # Look for stats link
-            if not stats_url:
+            # Look for stats link (allow related domains for cross-domain stats hosts)
+            if not stats_url and self._is_related_domain(link_domain, base_domain):
                 if re.search(r'\bstat', href, re.I) or re.search(r'\bstat', text, re.I):
                     stats_url = full_url
 

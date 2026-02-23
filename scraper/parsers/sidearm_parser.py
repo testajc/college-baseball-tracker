@@ -834,6 +834,149 @@ class SidearmParser:
 
         return batting, pitching
 
+    def parse_sidearm_api_stats(self, data) -> Tuple[Dict[str, Dict], Dict[str, Dict]]:
+        """Parse stats from a SIDEARM JSON API response.
+        The API may return various formats; try common structures."""
+        batting = {}
+        pitching = {}
+
+        if not isinstance(data, (dict, list)):
+            return batting, pitching
+
+        # Format 1: {"hitting": [...], "pitching": [...]}
+        hitting_list = None
+        pitching_list = None
+
+        if isinstance(data, dict):
+            # Try direct keys
+            for key in ('hitting', 'hittingStats', 'batting', 'battingStats',
+                        'individualHittingStats'):
+                if key in data and isinstance(data[key], list):
+                    hitting_list = data[key]
+                    break
+            for key in ('pitching', 'pitchingStats', 'individualPitchingStats'):
+                if key in data and isinstance(data[key], list):
+                    pitching_list = data[key]
+                    break
+
+            # Try nested: data.stats.hitting / data.individualStats.*
+            if not hitting_list:
+                stats = data.get('stats', data.get('individualStats', {}))
+                if isinstance(stats, dict):
+                    for key in ('hitting', 'hittingStats', 'batting',
+                                'individualHittingStats'):
+                        if key in stats and isinstance(stats[key], list):
+                            hitting_list = stats[key]
+                            break
+                    for key in ('pitching', 'pitchingStats',
+                                'individualPitchingStats'):
+                        if key in stats and isinstance(stats[key], list):
+                            pitching_list = stats[key]
+                            break
+
+        if hitting_list:
+            batting = self._parse_api_stat_list(hitting_list, 'batting')
+        if pitching_list:
+            pitching = self._parse_api_stat_list(pitching_list, 'pitching')
+
+        return batting, pitching
+
+    def _parse_api_stat_list(self, stat_list: list, stat_type: str) -> Dict[str, Dict]:
+        """Parse a list of player stat objects from an API response."""
+        result = {}
+
+        HITTING_MAP = {
+            'atBats': 'at_bats', 'ab': 'at_bats',
+            'runs': 'runs', 'r': 'runs',
+            'hits': 'hits', 'h': 'hits',
+            'doubles': 'doubles', '2b': 'doubles',
+            'triples': 'triples', '3b': 'triples',
+            'homeRuns': 'home_runs', 'hr': 'home_runs',
+            'runsBattedIn': 'rbi', 'rbi': 'rbi',
+            'walks': 'walks', 'bb': 'walks',
+            'strikeouts': 'strikeouts', 'so': 'strikeouts', 'k': 'strikeouts',
+            'stolenBases': 'stolen_bases', 'sb': 'stolen_bases',
+            'caughtStealing': 'caught_stealing', 'cs': 'caught_stealing',
+            'hitByPitch': 'hit_by_pitch', 'hbp': 'hit_by_pitch',
+            'sacrificeFlies': 'sacrifice_flies', 'sf': 'sacrifice_flies',
+            'sacrificeHits': 'sacrifice_hits', 'sh': 'sacrifice_hits',
+            'gamesPlayed': 'games', 'g': 'games', 'gp': 'games',
+        }
+        HITTING_FLOAT = {
+            'battingAverage': 'batting_average', 'avg': 'batting_average',
+            'onBasePercentage': 'on_base_percentage', 'obp': 'on_base_percentage',
+            'sluggingPercentage': 'slugging_percentage', 'slg': 'slugging_percentage',
+            'ops': 'ops',
+        }
+        PITCHING_MAP = {
+            'appearances': 'appearances', 'app': 'appearances', 'g': 'appearances',
+            'gamesStarted': 'games_started', 'gs': 'games_started',
+            'wins': 'wins', 'w': 'wins',
+            'losses': 'losses', 'l': 'losses',
+            'saves': 'saves', 'sv': 'saves',
+            'hitsAllowed': 'hits_allowed',
+            'runsAllowed': 'runs_allowed',
+            'earnedRunsAllowed': 'earned_runs', 'er': 'earned_runs',
+            'walksAllowed': 'walks', 'bb': 'walks',
+            'strikeouts': 'strikeouts', 'so': 'strikeouts', 'k': 'strikeouts',
+            'homeRunsAllowed': 'home_runs_allowed',
+            'hitBatters': 'hit_batters', 'hb': 'hit_batters',
+            'wildPitches': 'wild_pitches', 'wp': 'wild_pitches',
+        }
+        PITCHING_FLOAT = {
+            'earnedRunAverage': 'era', 'era': 'era',
+            'whip': 'whip',
+        }
+
+        int_map = HITTING_MAP if stat_type == 'batting' else PITCHING_MAP
+        float_map = HITTING_FLOAT if stat_type == 'batting' else PITCHING_FLOAT
+
+        for p in stat_list:
+            if not isinstance(p, dict):
+                continue
+            if p.get('isAFooterStat') or p.get('isFooter'):
+                continue
+
+            name = p.get('playerName', p.get('name', p.get('player', '')))
+            if not name or not isinstance(name, str):
+                continue
+            # Normalize "Last, First" to "First Last"
+            if ',' in name:
+                parts = name.split(',', 1)
+                name = f"{parts[1].strip()} {parts[0].strip()}"
+
+            stats = {}
+            for src, dst in int_map.items():
+                val = p.get(src)
+                if val is not None:
+                    try:
+                        stats[dst] = int(float(val))
+                    except (ValueError, TypeError):
+                        pass
+            for src, dst in float_map.items():
+                val = p.get(src)
+                if val is not None:
+                    try:
+                        stats[dst] = float(val)
+                    except (ValueError, TypeError):
+                        pass
+
+            # Innings pitched special handling
+            if stat_type == 'pitching':
+                ip_val = p.get('inningsPitched', p.get('ip'))
+                if ip_val is not None:
+                    stats['innings_pitched'] = self._parse_stat_value(
+                        str(ip_val), 'innings_pitched')
+
+            if stats:
+                if stat_type == 'batting':
+                    stats = self._calc_batting_derived(stats)
+                else:
+                    stats = self._calc_pitching_derived(stats)
+                result[name] = stats
+
+        return result
+
     # ── HTML table parsers ───────────────────────────────────────────
 
     def parse_batting_stats(self, html: str) -> Dict[str, Dict]:

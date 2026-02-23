@@ -412,12 +412,14 @@ class DatabaseManager:
         # Upsert team
         team_id = self.upsert_team(school_name, division, conference)
 
+        upserted_player_ids = set()
         players_saved = 0
         for player_data in result.get('players', []):
             try:
                 player_id = self.upsert_player(team_id, player_data)
                 if player_id < 0:
                     continue
+                upserted_player_ids.add(player_id)
 
                 if player_data.get('batting_stats'):
                     self.upsert_hitting_stats(player_id, player_data['batting_stats'])
@@ -429,5 +431,35 @@ class DatabaseManager:
             except Exception as e:
                 logger.error(f"Error saving player {player_data.get('name', '?')}: {e}")
 
+        # Remove stale players no longer on roster
+        if upserted_player_ids:
+            self._cleanup_stale_players(team_id, upserted_player_ids)
+
         logger.info(f"Saved {players_saved} players for {school_name}")
         return players_saved
+
+    def _cleanup_stale_players(self, team_id: int, current_player_ids: set):
+        """Remove players no longer on the team's current roster."""
+        conn = self._get_conn()
+        with conn.cursor() as cur:
+            placeholders = ','.join(['%s'] * len(current_player_ids))
+            params = [team_id] + list(current_player_ids)
+
+            # Delete orphaned email_notifications first (no CASCADE on player_id)
+            cur.execute(f"""
+                DELETE FROM email_notifications
+                WHERE player_id IN (
+                    SELECT id FROM players WHERE team_id = %s AND id NOT IN ({placeholders})
+                )
+            """, params)
+
+            # Delete stale players (CASCADE handles hitting_stats, pitching_stats,
+            # favorites, portal_alerts)
+            cur.execute(f"""
+                DELETE FROM players WHERE team_id = %s AND id NOT IN ({placeholders})
+            """, params)
+
+            removed = cur.rowcount
+            if removed > 0:
+                logger.info(f"  Removed {removed} stale players from team {team_id}")
+            conn.commit()
