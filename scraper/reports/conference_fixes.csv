@@ -1,0 +1,107 @@
+school_name,old_url,new_url,method,confidence
+La Roche,https://larocheredhawks.com,https://www.larochesports.com,conference_site,high
+Penn State Altoona,https://altoonaathletics.com,https://www.psaltoonalions.com,conference_site,high
+Penn State Behrend,https://behrendlions.com,https://psblions.com,conference_site,high
+Pitt-Bradford,https://pittbradfordsports.com,https://athletics.pittbradford.org,conference_site,high
+Gwynedd Mercy,https://gmercygriffinsat.com,https://gwyneddathletics.com,conference_site,high
+Christopher Newport,https://cnucaptains.com,https://www.cnusports.com,conference_site,high
+Cal St. Dominguez Hills,https://csudhtorosathletics.com,https://gotoros.com,conference_site,high
+Cal St. San Bernardino,https://caborathletics.com,https://csusbathletics.com,conference_site,high
+Gordon,https://gordonathletics.com,https://athletics.gordon.edu,conference_site,high
+Elmhurst,https://elmhurstsports.com,https://elmhurstbluejays.com,conference_site,high
+Johnson C. Smith,https://jcsugoldenbulls.com,https://goldenbullsports.com,conference_site,high
+Lincoln (PA),https://lincolnlions.com,https://lulions.com,conference_site,high
+Virginia St.,https://vsutrojans.com,https://govsutrojans.com,conference_site,high
+Virginia Union,https://vuupanthers.com,https://vuusports.com,conference_site,high
+Winston-Salem St.,https://wssrams.com,https://wssurams.com,conference_site,high
+Clarks Summit,https://csudefenders.com,https://www.gocsudefenders.com,conference_site,high
+Notre Dame (MD),https://ndmathletics.com,https://notredamegators.com,conference_site,high
+Brooklyn College,https://brooklyncollegeathletics.com,https://www.brooklyncollegeathletics.com,conference_site,high
+Hunter,https://huntercollegeathletics.com,https://www.huntercollegeathletics.com,conference_site,high
+Swarthmore,https://swarthmoresports.com,https://swarthmoreathletics.com,conference_site,high
+Chowan,https://gochowanhawks.com,https://gocuhawks.com,conference_site,high
+Converse,https://goconverse.com,https://govalkyries.com,conference_site,high
+Mount Olive,https://mountolivetrojans.com,https://umotrojans.com,conference_site,high
+Queens (NY),https://qcknights.com,https://queensknights.com,conference_site,high
+Roberts Wesleyan,https://rwcredhawks.com,https://robertsredhawks.com,conference_site,high
+Alfred,https://alfredathletics.com,https://gosaxons.com,conference_site,high
+Elmira,https://goelmira.com,https://athletics.elmira.edu,conference_site,high
+Hartwick,https://hartwickathletics.com,https://www.hartwickhawks.com,conference_site,high
+Michigan Tech,https://mtuhuskies.com,https://michigantechhuskies.com,conference_site,high
+Wayne St. (MI),https://wsuwarriors.com,https://wsuathletics.com,conference_site,high
+Indianapolis,https://uindyathletics.com,https://athletics.uindy.edu,conference_site,high
+Quincy,https://quincyhawks.com,https://quhawks.com,conference_site,high
+Southwest Baptist,https://sbubearcat.com,https://www.sbubearcats.com,conference_site,high
+Montana St. Billings,https://msbsports.com,https://msubsports.com,conference_site,high
+Christian Brothers,https://cbubuccaneers.com,https://cbubucs.com,conference_site,high
+Hanover,https://hanoverathletics.com,https://athletics.hanover.edu,conference_site,high
+Cameron,https://cameronaggieathletics.com,https://cameronaggies.com,conference_site,high
+Eastern New Mexico,https://goenmugranados.com,https://goeasternathletics.com,conference_site,high
+Texas A&M International,https://tamiu.edu/athletics,https://godustdevils.com,conference_site,high
+Western New Mexico,https://wnmuathletics.com,https://wnmumustangs.com,conference_site,high
+Goucher,https://goucherathletics.com,https://athletics.goucher.edu,conference_site,high
+Moravian,https://moravianathletics.com,https://moraviansports.com,conference_site,high
+Eastern Connecticut,https://easternctwarriors.com,https://gowarriorathletics.com,conference_site,high
+UMass Boston,https://umbathletics.com,https://beaconsathletics.com,conference_site,high
+Plymouth State,https://plymouthstateathletics.com,https://athletics.plymouth.edu,conference_site,high
+Rhode Island College,https://ricathletics.com,http://goanchormen.com,conference_site,high
+Western Connecticut,https://wcsuathletics.com,https://westconnathletics.com,conference_site,high
+Fitchburg State,https://fitchburgathletics.com,https://www.fitchburgfalcons.com,conference_site,high
+Framingham State,https://framinghamrams.com,https://www.fsurams.com,conference_site,high
+MCLA,https://mclatrailblazers.com,https://athletics.mcla.edu,conference_site,high
+Worcester State,https://worcesterstateathletics.com,https://www.wsulancers.com,conference_site,high
+West Liberty,https://westlibertyathletics.com,https://hilltoppersports.com,conference_site,high
+West Virginia St.,https://wvstateyellowjackets.com,https://wvsuyellowjackets.com,conference_site,high
+Wheeling,https://wheelingcardinals.com,https://wucardinals.com,conference_site,high
+Central Oklahoma,https://bronchoathletics.com,https://bronchosports.com,conference_site,high
+Missouri Southern,https://mssuathletics.com,https://mssulions.com,conference_site,high
+Northwest Missouri St.,https://bearcat-athletics.com,https://bearcatsports.com,conference_site,high
+Illinois College,https://icblueboys.com,https://illinoiscollegeathletics.com,conference_site,high
+Knox,https://knoxprairefire.com,https://prairiefire.knox.edu,conference_site,high
+Ripon,https://riponathletics.com,https://riponredhawks.com,conference_site,high
+Thomas College,https://thomasterriers.com,https://athletics.thomas.edu,conference_site,high
+Concordia (WI),https://cufalcons.com,https://www.cucougars.com,conference_site,high
+Edgewood,https://edgewoodathletics.com,https://edgewoodeagles.com,conference_site,high
+Oberlin,https://oberlinyeomen.com,https://goyeo.com,conference_site,high
+Wabash,https://wabash.edu/athletics,https://sports.wabash.edu,conference_site,high
+Pace,https://pacesetters.com,https://paceuathletics.com,conference_site,high
+Gallaudet,https://gallaudetathletics.com,https://gallaudetbison.com,conference_site,high
+William Paterson,https://wpunj.com,https://www.wpupioneers.com,conference_site,high
+Capital,https://capitalathletics.com,https://athletics.capital.edu,conference_site,high
+Heidelberg,https://bergbergies.com,https://www.bergathletics.com,conference_site,high
+Wilmington (OH),https://wilmingtonathletics.com,https://wilmingtonquakers.com,conference_site,high
+Saint Vincent,https://svcathletics.com,https://athletics.stvincent.edu,conference_site,high
+Washington & Jefferson,https://wjsports.com,https://gopresidents.com,conference_site,high
+Waynesburg,https://waynesburg.edu/athletics,https://waynesburgsports.com,conference_site,high
+Edinboro,https://edinborosports.com,https://gofightingscots.com,conference_site,high
+Gannon,https://gannonathletics.com,https://gannonsports.com,conference_site,high
+Kutztown,https://kutztownbears.com,https://kubears.com,conference_site,high
+Seton Hill,https://setonhillgriffinssports.com,https://athletics.setonhill.edu,conference_site,high
+Slippery Rock,https://sruathletics.com,https://rockathletics.com,conference_site,high
+West Chester,https://wcupathletics.com,https://wcupagoldenrams.com,conference_site,high
+Black Hills St.,https://bhsuyellowjackets.com,https://bhsuathletics.com,conference_site,high
+Chadron St.,https://csceagles.com,https://chadroneagles.com,conference_site,high
+Western Colorado,https://mountaineersathletics.com,https://gomountaineers.com,conference_site,high
+Claremont-Mudd-Scripps,https://cmsathletics.com,https://cmsathletics.org,conference_site,high
+Albany St. (GA),https://asurams.com,https://asugoldenrams.com,conference_site,high
+Fort Valley St.,https://fvsuwildcats.com,https://fvsusports.com,conference_site,high
+Kentucky St.,https://kysuathletics.com,https://ksuthorobreds.com,conference_site,high
+Lane,https://lanedragons.com,https://golcdragons.com,conference_site,high
+LeMoyne-Owen,https://locmagicians.com,https://athletics.loc.edu,conference_site,high
+Tuskegee,https://tuskegeegoldentigers.com,https://goldentigersports.com,conference_site,high
+Palm Beach Atlantic,https://pbau.com,https://pbasailfish.com,conference_site,high
+Farmingdale State,https://farmingdaleathletics.com,https://farmingdalesports.com,conference_site,high
+Maritime (NY),https://sunymaritime.edu/athletics,https://maritimeathletics.com,conference_site,high
+Mount Saint Vincent,https://msvdolphins.com,https://msmcknights.com,conference_site,high
+St. Joseph's (Brooklyn),https://sjcbearsathletics.com,https://sjbkathletics.com,conference_site,high
+St. Joseph's (LI),https://sjcgoldeneagles.com,https://sjliathletics.com,conference_site,high
+Case Western Reserve,https://cwruspartans.com,https://athletics.case.edu,conference_site,high
+Wash U,https://wubears.com,https://washubears.com,conference_site,high
+Crown,https://crownathletics.com,https://athletics.crown.edu,conference_site,high
+Martin Luther,https://martinlutherknights.com,https://mlcknights.com,conference_site,high
+Northwestern (MN),https://nweagles.com,https://unweagles.com,conference_site,high
+N.C. Wesleyan,https://ncwu.edu/athletics,https://ncwsports.com,conference_site,high
+UW-Oshkosh,https://uwosports.com,https://uwoshkoshtitans.com,conference_site,high
+UW-Platteville,https://uwppioneers.com,https://letsgopioneers.com,conference_site,high
+UW-Stevens Point,https://uwsppointers.com,https://athletics.uwsp.edu,conference_site,high
+UW-Stout,https://uwstoutathletics.com,https://stoutbluedevils.com,conference_site,high
