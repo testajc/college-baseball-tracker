@@ -217,9 +217,10 @@ python main.py status
 
 Daily scrape runs via `.github/workflows/daily-scrape.yml`:
 - Cron: 6 AM UTC daily
-- Checks season start date (Feb 21, 2026) before running
+- Checks season start date (Feb 14, 2026) before running
 - Manual trigger with `force` option
-- Saves progress artifacts between runs
+- Saves progress artifacts between runs (90-day retention)
+- **Artifact recovery**: If `scrape-progress` artifact expires, seeds `scrape_history.json` from DB teams with today's date, putting scheduler in daily rotation mode
 
 ### Known Scraper Issues
 
@@ -250,11 +251,13 @@ Note: Team count exceeds CSV total because some schools have multiple entries or
 
 ## Recent Changes
 
-### Session 6 (Feb 23, 2026) - Stale Players, Cross-Domain Stats, SIDEARM API
+### Session 6 (Feb 23-24, 2026) - Stale Players, Cross-Domain Stats, SIDEARM API, Workflow Fix
 1. **Stale player cleanup** in `database.py` - `save_school_data()` now tracks upserted player IDs and deletes players no longer on the current roster via `_cleanup_stale_players()`. Cleans `email_notifications` (no CASCADE) then players (CASCADE handles stats, favorites, portal_alerts). Safety guard: skips cleanup if scraper returns 0 players.
 2. **Cross-domain stats URL discovery** in `url_discovery.py` - Added `_is_related_domain()` to allow stats links from subdomains (e.g., `data.clemsontigers.com` from `clemsontigers.com`). Roster discovery remains same-domain only.
 3. **SIDEARM API stats fallback** in `main.py` - After all HTML parsers fail, tries SIDEARM API endpoints (`/services/responsive-calendar.ashx?type=stats&sport=baseball`, `/api/stats/baseball`). Handles both JSON and HTML+Nuxt responses.
 4. **`parse_sidearm_api_stats()`** in `sidearm_parser.py` - New parser for JSON API responses with flexible key matching for various SIDEARM API formats.
+5. **Workflow artifact recovery** in `daily-scrape.yml` - When `scrape-progress` artifact expires, seeds `scrape_history.json` from DB team names with today's date. Prevents scheduler from falling into initial-scrape mode and only trying dead-domain schools.
+6. **Daily scrape config tuning** in `config.py` - Reduced `between_schools` delay from 10-20s to 3-6s (different domains don't need courtesy delays) and removed hourly request limit for daily updates. Prevents 6-hour timeout on full scrape runs.
 
 ### Session 5 (Feb 23, 2026) - Conference URL Discovery
 1. **`validate_schools.py`** (new) - School classification + conference URL discovery tool:
@@ -324,6 +327,8 @@ Note: Team count exceeds CSV total because some schools have multiple entries or
 ## Git History (Recent)
 
 ```
+05d7680 Fix workflow timeout: seed with today's date, reduce inter-school delays
+85661fe Add scrape history seeding from DB when artifact expires
 15cf576 Fix stale players, cross-domain stats discovery, and SIDEARM API fallback
 29b9d25 Update 106 school URLs from conference website discovery
 1b61243 Add scraper recovery for failed schools: URL discovery, generic parsers, browser fallback
