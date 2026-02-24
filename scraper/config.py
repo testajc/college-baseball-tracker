@@ -11,11 +11,11 @@ INITIAL_SCRAPE_CONFIG = {
 
 # Phase 2: Daily Updates
 DAILY_UPDATE_CONFIG = {
-    'between_requests': (3, 6),            # 3-6 seconds between requests
+    'between_requests': (2, 4),            # 2-4 seconds between requests
     'between_pages_same_school': (2, 4),
-    'between_schools': (10, 20),           # 10-20 seconds between schools
+    'between_schools': (3, 6),             # 3-6 seconds between schools (different domains)
     'max_schools_per_day': 500,
-    'max_requests_per_hour': 300,
+    'max_requests_per_hour': 9999,         # no limit (cross-domain, logging only)
 }
 
 # Error handling

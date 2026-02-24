@@ -74,18 +74,20 @@ jobs:
             echo "scrape_history.json missing (artifact expired?) — seeding from DB"
             python -c "
           import json
+          from datetime import date
           from database import DatabaseManager
           db = DatabaseManager()
           teams = db.get_schools_in_db()
           db.close()
           if teams:
+              today = date.today().isoformat()
               history = {
                   'initial_scrape_complete': True,
-                  'last_scraped': {name: '2026-02-22' for name in teams}
+                  'last_scraped': {name: today for name in teams}
               }
               with open('scrape_history.json', 'w') as f:
                   json.dump(history, f, indent=2)
-              print(f'Seeded scrape_history.json with {len(teams)} teams from DB')
+              print(f'Seeded scrape_history.json with {len(teams)} teams (last_scraped={today})')
           else:
               print('DB has no teams — starting fresh initial scrape')
           "
