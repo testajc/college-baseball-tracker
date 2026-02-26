@@ -50,8 +50,10 @@ CSV_FIELDS = [
 ]
 
 # Common name variations for fuzzy matching
+# Keys and values are both used as match keys, so either direction works
 NAME_ALIASES = {
-    # Abbreviation -> Full (or vice versa)
+    # Acronyms
+    'byu': 'brigham young',
     'unc': 'north carolina',
     'unc greensboro': 'north carolina-greensboro',
     'unc wilmington': 'north carolina-wilmington',
@@ -85,6 +87,7 @@ NAME_ALIASES = {
     'iupui': 'indiana-purdue-indianapolis',
     'ipfw': 'indiana-purdue-fort wayne',
     'suny': 'state university of new york',
+    # St. / State
     'penn': 'pennsylvania',
     'penn st.': 'penn state',
     'ohio st.': 'ohio state',
@@ -102,18 +105,71 @@ NAME_ALIASES = {
     'fresno st.': 'fresno state',
     'san diego st.': 'san diego state',
     'san jose st.': 'san jose state',
+    'kent st.': 'kent state',
+    # Short forms used in CSV
+    'app state': 'appalachian state',
+    'app st.': 'appalachian st.',
+    'central arkansas': 'central arkansas',
+    'air force': 'united states air force academy',
+    'army': 'united states military academy',
+    'navy': 'united states naval academy',
+    'cal': 'california',
+    'cal poly': 'california polytechnic state',
+    'cal st. fullerton': 'california st. fullerton',
+    'cal st. northridge': 'california st. northridge',
+    'cal st. bakersfield': 'california st. bakersfield',
+    'long beach st.': 'california st. long beach',
+    'sacramento st.': 'california st. sacramento',
+    'central conn. st.': 'central connecticut state',
+    'east tenn. st.': 'east tennessee state',
+    'fla. atlantic': 'florida atlantic',
+    'fla. international': 'florida international',
+    'ga. southern': 'georgia southern',
+    'ga. tech': 'georgia institute of technology',
+    'georgia tech': 'georgia institute of technology',
+    'holy cross': 'college of the holy cross',
+    'miami (oh)': 'miami ohio',
+    'miami': 'miami florida',
+    'middle tenn.': 'middle tennessee state',
+    'nc state': 'north carolina state',
+    'nc a&t': 'north carolina a&t',
+    'nc central': 'north carolina central',
+    'se missouri st.': 'southeast missouri state',
+    'southern miss.': 'southern mississippi',
+    'tenn. tech': 'tennessee technological',
+    'texas a&m': 'texas a&m',
+    'texas a&m-cc': 'texas a&m-corpus christi',
+    'alcorn': 'alcorn state',
+    'citadel': 'the citadel',
+    'william & mary': 'college of william & mary',
+    'charleston': 'college of charleston',
+    'wm': 'college of william and mary',
+    'lmu': 'loyola marymount',
+    'st. johns': 'st. john\'s',
 }
 
 
-def normalize_name(name: str) -> str:
-    """Normalize a school name for comparison."""
+def _strip_school_name(name: str) -> str:
+    """Strip a full school name down to its core identifier.
+    'University of Alabama' -> 'alabama'
+    'California State University – Fullerton' -> 'cal st fullerton'
+    'Appalachian State University' -> 'appalachian st'
+    """
     n = name.lower().strip()
-    # Remove common suffixes
-    n = re.sub(r'\buniversity\b', '', n)
-    n = re.sub(r'\bcollege\b', '', n)
+    # Handle "University of X" -> "X"
+    n = re.sub(r'^the\s+', '', n)
+    n = re.sub(r'^university\s+of\s+', '', n)
+    # Handle "X University" -> "X"
+    n = re.sub(r'\s+university$', '', n)
+    # Handle "X College" -> "X"
+    n = re.sub(r'\s+college$', '', n)
+    # Handle "California State University – Fullerton" patterns
+    n = re.sub(r'(\w+)\s+state\s+university\s*[–—-]\s*', r'\1 st. ', n)
+    n = re.sub(r'\s+state\s+university$', ' st.', n)
+    # Abbreviate "State" -> "St."
     n = re.sub(r'\bstate\b', 'st.', n)
-    n = re.sub(r'\buniv\.?\b', '', n)
-    # Normalize punctuation
+    # Clean up dashes, punctuation
+    n = re.sub(r'[–—]', '-', n)
     n = re.sub(r'[\'"`]', '', n)
     n = re.sub(r'\s*-\s*', '-', n)
     n = re.sub(r'\s+', ' ', n).strip()
@@ -121,25 +177,78 @@ def normalize_name(name: str) -> str:
     return n
 
 
-def _build_norm_key(name: str) -> str:
-    """Build an even more aggressive normalized key for matching."""
+def _make_match_keys(name: str) -> List[str]:
+    """Generate multiple matching keys for a school name."""
+    keys = set()
+    stripped = _strip_school_name(name)
+    keys.add(stripped)
+
     n = name.lower().strip()
-    # Remove all common suffixes
-    for suffix in ['university', 'college', 'institute of technology',
-                   'state university', 'university of', 'the']:
-        n = n.replace(suffix, '')
-    # Remove punctuation
-    n = re.sub(r'[^a-z0-9 ]', '', n)
-    n = re.sub(r'\s+', ' ', n).strip()
-    return n
+
+    # Also add aggressive version: letters + spaces only
+    aggressive = re.sub(r'[^a-z0-9 ]', '', stripped)
+    aggressive = re.sub(r'\s+', ' ', aggressive).strip()
+    keys.add(aggressive)
+
+    # Add version without "st" (so "Ball St." matches "Ball State University")
+    no_st = re.sub(r'\bst\.?\b', '', stripped).strip()
+    no_st = re.sub(r'\s+', ' ', no_st)
+    if no_st and len(no_st) > 2:
+        keys.add(no_st)
+
+    # Handle "Cal St. Fullerton" / "California State University – Fullerton" patterns
+    # Index the city part after dash for "State University – City" names
+    if 'california' in n or 'cal st' in stripped:
+        for part in re.split(r'[-–—]', n):
+            part = part.strip()
+            if part and part not in ('california', 'cal', 'california state university'):
+                city = _strip_school_name(part)
+                if city and len(city) > 2:
+                    keys.add(f"cal st. {city}")
+                    keys.add(f"cal st {city}")
+
+    # Check NAME_ALIASES in both directions
+    # Match against stripped name AND the original lowercase name
+    for alias, canonical in NAME_ALIASES.items():
+        alias_clean = alias.replace('.', '').replace(' ', '')
+        canonical_clean = canonical.replace('.', '').replace(' ', '')
+        stripped_clean = stripped.replace('.', '').replace(' ', '')
+
+        if (alias == stripped or canonical == stripped or
+                alias_clean == stripped_clean or canonical_clean == stripped_clean or
+                alias in stripped or canonical in stripped):
+            keys.add(alias)
+            keys.add(canonical)
+
+    # Also check if the stripped name IS a known alias value (reverse lookup)
+    _reverse_aliases = {v: k for k, v in NAME_ALIASES.items()}
+    if stripped in _reverse_aliases:
+        keys.add(_reverse_aliases[stripped])
+    # And check without dots
+    stripped_nodots = stripped.replace('.', '').strip()
+    if stripped_nodots in _reverse_aliases:
+        keys.add(_reverse_aliases[stripped_nodots])
+
+    # Common short forms: "Appalachian" -> "app", "University of X" -> "X"
+    # Handle "Xan State" vs "X St."
+    if 'st' in stripped:
+        # Add version with full "state" word
+        keys.add(re.sub(r'\bst\.?\b', 'state', stripped).strip())
+
+    return [k for k in keys if k and len(k) > 1]
 
 
 def fuzzy_match_score(name1: str, name2: str) -> float:
-    """Simple fuzzy match score between two names (0.0-1.0)."""
-    # Try thefuzz if available, otherwise use simple approach
+    """Fuzzy match score between two names (0.0-1.0)."""
     try:
         from thefuzz import fuzz
-        return fuzz.token_sort_ratio(name1, name2) / 100.0
+        # Use multiple strategies and take the best
+        scores = [
+            fuzz.token_sort_ratio(name1, name2) / 100.0,
+            fuzz.token_set_ratio(name1, name2) / 100.0,
+            fuzz.partial_ratio(name1, name2) / 100.0,
+        ]
+        return max(scores)
     except ImportError:
         # Simple fallback: word overlap ratio
         words1 = set(name1.lower().split())
@@ -185,48 +294,31 @@ def load_csv_schools() -> List[dict]:
 
 
 def build_name_index(schools: List[dict], name_key: str = 'name') -> Dict[str, dict]:
-    """Build a lookup from normalized name to school entry."""
+    """Build a lookup from multiple normalized keys to school entry."""
     index = {}
     for s in schools:
         name = s.get(name_key, s.get('school_name', ''))
-        norm = normalize_name(name)
-        key = _build_norm_key(name)
-        index[norm] = s
-        if key != norm:
-            index[key] = s
-        # Also index any known aliases
-        for alias, canonical in NAME_ALIASES.items():
-            if alias in norm or canonical in norm:
-                index[alias] = s
-                index[canonical] = s
+        for key in _make_match_keys(name):
+            if key not in index:  # First entry wins (avoids ambiguity)
+                index[key] = s
     return index
 
 
 def find_best_match(name: str, index: Dict[str, dict],
                     all_names: List[str]) -> Optional[Tuple[str, float]]:
     """Find the best match for a name in the index."""
-    norm = normalize_name(name)
-    key = _build_norm_key(name)
+    # Try all match keys for the input name
+    for key in _make_match_keys(name):
+        if key in index:
+            return key, 1.0
 
-    # Exact match
-    if norm in index:
-        return norm, 1.0
-    if key in index:
-        return key, 1.0
-
-    # Check aliases
-    lower = name.lower().strip()
-    if lower in NAME_ALIASES:
-        alias_norm = normalize_name(NAME_ALIASES[lower])
-        if alias_norm in index:
-            return alias_norm, 1.0
-
-    # Fuzzy match against all names
+    # Fuzzy match against all keys using stripped names
+    stripped = _strip_school_name(name)
     best_match = None
     best_score = 0.0
 
     for candidate in all_names:
-        score = fuzzy_match_score(norm, candidate)
+        score = fuzzy_match_score(stripped, candidate)
         if score > best_score:
             best_score = score
             best_match = candidate

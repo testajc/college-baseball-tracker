@@ -56,22 +56,28 @@ def scrape_division(page, division: str, url: str, max_retries: int = 3) -> list
     for attempt in range(1, max_retries + 1):
         try:
             logger.info(f"[{division}] Attempt {attempt}: navigating to {url}")
-            page.goto(url, wait_until='networkidle', timeout=60000)
+            # Use domcontentloaded — networkidle never fires on NCSA (analytics/ads)
+            try:
+                page.goto(url, wait_until='domcontentloaded', timeout=30000)
+            except Exception as nav_err:
+                logger.warning(f"[{division}] Navigation issue: {nav_err}, trying to continue anyway")
 
-            # Wait for the college list to render
-            # NCSA uses various selectors - try multiple
+            # Wait for JS to render the college list
+            # NCSA uses React — content renders after initial DOM load
             selectors = [
                 '.college-list',
                 '.wp-block-ncsa-college-list',
                 '[class*="CollegeList"]',
+                '[class*="college"]',
                 '[data-testid*="college"]',
                 'table',
+                'a[href*="/baseball/"]',
             ]
 
             list_found = False
             for selector in selectors:
                 try:
-                    page.wait_for_selector(selector, timeout=10000)
+                    page.wait_for_selector(selector, timeout=15000)
                     list_found = True
                     logger.info(f"[{division}] Found content with selector: {selector}")
                     break
@@ -79,13 +85,15 @@ def scrape_division(page, division: str, url: str, max_retries: int = 3) -> list
                     continue
 
             if not list_found:
-                logger.warning(f"[{division}] No known selector matched, will try parsing page anyway")
+                # Last resort: just wait for page to settle
+                logger.warning(f"[{division}] No known selector matched, waiting 10s for content")
+                time.sleep(10)
 
             # Scroll to bottom to trigger lazy-loading
             _scroll_to_bottom(page)
 
             # Give extra time for any final renders
-            time.sleep(2)
+            time.sleep(3)
 
             # Extract schools from the rendered page
             schools = _extract_schools(page, division)
@@ -121,79 +129,72 @@ def _scroll_to_bottom(page):
 
 
 def _extract_schools(page, division: str) -> list:
-    """Extract school entries from the rendered page using multiple strategies."""
-    schools = []
+    """Extract school entries from the rendered NCSA page.
 
-    # Strategy 1: Look for structured college list items (links with school names)
+    NCSA structure: .wp-block-ncsa-college-list contains .row divs with
+    Schema.org ListItem markup. Each row has a .container with:
+      - [itemprop="name"] > a = school name + link
+      - [itemprop="address"] > spans = city, state
+      - div with conference text
+      - div with division text (NCAA D1/D2/D3)
+    """
     schools = page.evaluate("""() => {
         const results = [];
         const seen = new Set();
 
-        // Strategy A: Look for college card/list items
-        const cards = document.querySelectorAll(
-            '.college-card, .college-item, [class*="CollegeCard"], ' +
-            '[class*="college-list"] li, [class*="college-list"] a, ' +
-            'table tbody tr'
+        // Each school is a .row with Schema.org itemtype CollegeOrUniversity
+        const rows = document.querySelectorAll(
+            '.wp-block-ncsa-college-list .row, ' +
+            '[itemtype*="CollegeOrUniversity"]'
         );
 
-        for (const card of cards) {
-            // Try to find name, state, conference
-            let name = '';
+        for (const row of rows) {
+            // School name from itemprop="name" or first <a>
+            const nameEl = row.querySelector('[itemprop="name"]') ||
+                           row.querySelector('a');
+            const name = nameEl?.textContent?.trim() || '';
+
+            if (!name || name.length < 3 || seen.has(name.toLowerCase())) continue;
+
+            // Link
+            const linkEl = row.querySelector('a[href]');
+            const link = linkEl?.href || '';
+
+            // State from address span
+            const addressEl = row.querySelector('[itemprop="address"]');
             let state = '';
-            let conference = '';
-            let link = '';
-
-            // Check if it's a table row
-            const cells = card.querySelectorAll('td');
-            if (cells.length >= 2) {
-                name = cells[0]?.textContent?.trim() || '';
-                state = cells.length >= 3 ? cells[1]?.textContent?.trim() : '';
-                conference = cells.length >= 3 ? cells[2]?.textContent?.trim() :
-                             cells[1]?.textContent?.trim() || '';
-                const a = cells[0]?.querySelector('a');
-                if (a) link = a.href || '';
-            } else {
-                // Card/list layout
-                const nameEl = card.querySelector(
-                    'h3, h4, .college-name, [class*="name"], a'
-                );
-                name = nameEl?.textContent?.trim() || card.textContent?.trim() || '';
-
-                const stateEl = card.querySelector(
-                    '.college-state, [class*="state"], [class*="location"]'
-                );
-                state = stateEl?.textContent?.trim() || '';
-
-                const confEl = card.querySelector(
-                    '.college-conference, [class*="conference"]'
-                );
-                conference = confEl?.textContent?.trim() || '';
-
-                const a = card.tagName === 'A' ? card : card.querySelector('a');
-                if (a) link = a.href || '';
+            if (addressEl) {
+                const regionEl = addressEl.querySelector('[itemprop="addressRegion"]');
+                state = regionEl?.textContent?.trim() || '';
+                if (!state) {
+                    // Fallback: last span in address
+                    const spans = addressEl.querySelectorAll('span');
+                    if (spans.length >= 2) {
+                        state = spans[spans.length - 1].textContent?.trim() || '';
+                    }
+                }
             }
 
-            // Clean up name (remove extra whitespace, trailing state/conf info)
-            name = name.replace(/\\s+/g, ' ').trim();
-
-            // Skip empty or too-short names, header rows, etc.
-            if (!name || name.length < 3 || seen.has(name.toLowerCase())) continue;
-            if (/^(school|college|university|name|institution)$/i.test(name)) continue;
+            // Conference: look for div that contains "Conference" or "League"
+            // or just grab text from the container divs
+            let conference = '';
+            const container = row.querySelector('.container') || row;
+            const divs = container.querySelectorAll(':scope > div');
+            for (const div of divs) {
+                const text = div.textContent?.trim() || '';
+                // Skip name, address, type (Public/Private), and division divs
+                if (div.querySelector('[itemprop]')) continue;
+                if (/^(Public|Private)$/i.test(text)) continue;
+                if (/^NCAA D[123]$/i.test(text)) continue;
+                if (text.includes('Conference') || text.includes('League') ||
+                    text.includes('Athletic') || text.includes('NAIA')) {
+                    conference = text;
+                    break;
+                }
+            }
 
             seen.add(name.toLowerCase());
             results.push({ name, state, conference, link });
-        }
-
-        // Strategy B: If few results, try all links that look like school pages
-        if (results.length < 50) {
-            const links = document.querySelectorAll('a[href*="/baseball/"]');
-            for (const a of links) {
-                const name = a.textContent?.trim();
-                if (!name || name.length < 3 || seen.has(name.toLowerCase())) continue;
-                if (/roster|stats|schedule|recruit|division/i.test(name)) continue;
-                seen.add(name.toLowerCase());
-                results.push({ name, state: '', conference: '', link: a.href || '' });
-            }
         }
 
         return results;
