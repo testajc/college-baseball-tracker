@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       command:
-        description: 'Command to run (run, diagnostic, status)'
+        description: 'Command to run (run, recover, diagnostic, status)'
         required: false
         default: 'run'
       force:
@@ -157,6 +157,8 @@ jobs:
             python main.py diagnostic
           elif [ "$CMD" = "status" ]; then
             python main.py status
+          elif [ "$CMD" = "recover" ]; then
+            python main.py recover $ARGS
           else
             python main.py run $ARGS
           fi
