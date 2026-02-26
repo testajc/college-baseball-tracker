@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Division } from "@prisma/client";
 
+export const dynamic = "force-dynamic";
+
 const VALID_DIVISIONS: Division[] = ["D1", "D2", "D3"];
 
 export async function GET(req: NextRequest) {
