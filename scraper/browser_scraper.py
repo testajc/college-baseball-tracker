@@ -1,6 +1,9 @@
 # scraper/browser_scraper.py
 
+import json
 import logging
+import subprocess
+import sys
 import time
 import random
 from typing import Dict, List, Optional
@@ -38,19 +41,32 @@ class BrowserScraper:
         self.max_schools = self.config.get('max_schools_per_run', 50)
         self._playwright = None
         self._browser = None
+        self._use_subprocess = False
 
     @property
     def available(self) -> bool:
         return PLAYWRIGHT_AVAILABLE
 
     def _ensure_browser(self):
-        """Launch browser if not already running."""
+        """Launch browser if not already running.
+        Falls back to subprocess mode if sync_playwright() fails
+        (e.g., in asyncio environments like GitHub Actions)."""
         if not PLAYWRIGHT_AVAILABLE:
             return False
+        if self._use_subprocess:
+            return True
         if self._browser is None:
-            self._playwright = sync_playwright().start()
-            self._browser = self._playwright.chromium.launch(headless=True)
-            logger.info("Browser launched for JS rendering")
+            try:
+                self._playwright = sync_playwright().start()
+                self._browser = self._playwright.chromium.launch(headless=True)
+                logger.info("Browser launched for JS rendering")
+            except RuntimeError as e:
+                if 'asyncio' in str(e).lower() or 'event loop' in str(e).lower():
+                    logger.warning(f"Playwright sync API failed (asyncio conflict): {e}")
+                    logger.info("Will use subprocess fallback for browser scraping")
+                    self._use_subprocess = True
+                    return True
+                raise
         return True
 
     def close(self):
@@ -89,6 +105,10 @@ class BrowserScraper:
         if not self._ensure_browser():
             result['errors'].append("Playwright not available")
             return result
+
+        # Use subprocess fallback if sync API is blocked by asyncio
+        if self._use_subprocess:
+            return self._scrape_school_subprocess(school)
 
         # Build full URLs
         full_roster = f"{base_url}{roster_url}" if not roster_url.startswith('http') else roster_url
@@ -155,6 +175,119 @@ class BrowserScraper:
 
         finally:
             page.close()
+
+        return result
+
+    def _scrape_school_subprocess(self, school: dict) -> dict:
+        """Scrape a school in a separate subprocess to avoid asyncio conflicts.
+        Spawns a fresh Python process that uses Playwright's sync API."""
+        school_name = school['school_name']
+        base_url = school.get('athletics_base_url', '').rstrip('/')
+        roster_url = school.get('roster_url', '/sports/baseball/roster')
+        stats_url = school.get('stats_url', '/sports/baseball/stats')
+
+        result = {
+            'school': school_name,
+            'division': school.get('division', ''),
+            'conference': school.get('conference', ''),
+            'players': [],
+            'success': False,
+            'errors': [],
+            'method': 'browser-subprocess'
+        }
+
+        full_roster = f"{base_url}{roster_url}" if not roster_url.startswith('http') else roster_url
+        full_stats = f"{base_url}{stats_url}" if not stats_url.startswith('http') else stats_url
+
+        # Pass URLs via argv to avoid f-string issues with URL characters
+        input_data = json.dumps({
+            'roster_url': full_roster,
+            'stats_url': full_stats,
+            'timeout': self.timeout,
+        })
+
+        script = '''
+import json, sys
+from playwright.sync_api import sync_playwright
+
+config = json.loads(sys.argv[1])
+results = {"roster_html": "", "stats_html": ""}
+with sync_playwright() as p:
+    browser = p.chromium.launch(headless=True)
+    page = browser.new_page()
+    page.set_default_timeout(config["timeout"])
+    try:
+        page.goto(config["roster_url"], wait_until="networkidle")
+        results["roster_html"] = page.content()
+    except Exception as e:
+        results["roster_error"] = str(e)
+    try:
+        page.goto(config["stats_url"], wait_until="networkidle")
+        results["stats_html"] = page.content()
+    except Exception as e:
+        results["stats_error"] = str(e)
+    page.close()
+    browser.close()
+print(json.dumps(results))
+'''
+
+        try:
+            logger.info(f"  Browser subprocess: {school_name}")
+            proc = subprocess.run(
+                [sys.executable, '-c', script, input_data],
+                capture_output=True, text=True, timeout=120
+            )
+
+            if proc.returncode != 0:
+                err = proc.stderr.strip()[-200:] if proc.stderr else 'unknown error'
+                result['errors'].append(f"Subprocess failed: {err}")
+                return result
+
+            data = json.loads(proc.stdout.strip())
+
+            # Parse roster
+            roster = []
+            if data.get('roster_html'):
+                roster = self.parser.parse_roster(data['roster_html'], school_name)
+                logger.info(f"  Subprocess roster: {len(roster)} players")
+
+            if not roster:
+                result['errors'].append("Subprocess: no players found on roster page")
+                return result
+
+            # Parse stats
+            batting_stats = {}
+            pitching_stats = {}
+            if data.get('stats_html'):
+                batting_stats, pitching_stats = self.parser.parse_nuxt_stats(data['stats_html'])
+                if not batting_stats:
+                    batting_stats = self.parser.parse_batting_stats(data['stats_html'])
+                if not pitching_stats:
+                    pitching_stats = self.parser.parse_pitching_stats(data['stats_html'])
+
+            # Merge
+            for player in roster:
+                player_name = player.get('name', '')
+                player['batting_stats'] = batting_stats.get(player_name)
+                player['pitching_stats'] = pitching_stats.get(player_name)
+                result['players'].append(player)
+
+            roster_names = {p.get('name') for p in roster}
+            for name, stats in batting_stats.items():
+                if name not in roster_names:
+                    result['players'].append({
+                        'name': name,
+                        'school': school_name,
+                        'batting_stats': stats,
+                        'pitching_stats': pitching_stats.get(name)
+                    })
+
+            result['success'] = len(result['players']) > 0
+
+        except subprocess.TimeoutExpired:
+            result['errors'].append("Subprocess timed out after 120s")
+        except Exception as e:
+            result['errors'].append(f"Subprocess error: {e}")
 
         return result
 

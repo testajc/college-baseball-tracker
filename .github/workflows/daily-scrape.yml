@@ -31,6 +31,9 @@ jobs:
       - name: Install dependencies
         run: pip install -r scraper/requirements.txt
 
+      - name: Install Playwright
+        run: playwright install chromium --with-deps
+
       - name: Check if season has started
         id: season_check
         run: |
@@ -55,6 +58,30 @@ jobs:
         run: |
           cd scraper
           python build_schools_db.py
+
+      - name: Scrape NCSA team list
+        if: steps.season_check.outputs.skip != 'true' || github.event.inputs.force == 'true'
+        run: |
+          cd scraper
+          python scrape_ncsa.py || echo "NCSA scrape failed (non-fatal) — continuing with existing CSV"
+
+      - name: Build master school list from NCSA
+        if: steps.season_check.outputs.skip != 'true' || github.event.inputs.force == 'true'
+        run: |
+          cd scraper
+          if [ -f ncsa_schools.json ]; then
+            python build_master_list.py || echo "Master list build failed (non-fatal)"
+          else
+            echo "No NCSA data — skipping master list build"
+          fi
+
+      - name: Backfill all teams into database
+        if: steps.season_check.outputs.skip != 'true' || github.event.inputs.force == 'true'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          cd scraper
+          python backfill_teams.py
 
       - name: Download previous progress
         if: steps.season_check.outputs.skip != 'true' || github.event.inputs.force == 'true'

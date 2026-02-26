@@ -114,17 +114,43 @@ class CollegeBaseballScraper:
         response = None
         roster_url = None
         base_domain = base_url.split('//')[1].split('/')[0] if '//' in base_url else base_url
+        effective_base_url = base_url  # May change if we follow a redirect
         for path in ROSTER_PATHS:
-            url = f"{base_url}{path}" if not path.startswith('http') else path
+            url = f"{effective_base_url}{path}" if not path.startswith('http') else path
             logger.debug(f"Trying roster: {url}")
             resp = self.request_handler.get(url)
             if resp:
-                # Skip if redirected to a different domain or to homepage
                 resp_domain = resp.url.split('//')[1].split('/')[0] if '//' in resp.url else ''
                 resp_path = resp.url.split(resp_domain, 1)[1] if resp_domain in resp.url else '/'
-                if resp_domain != base_domain and len(resp_path.strip('/')) < 5:
-                    logger.info(f"  Redirected to different domain ({resp_domain}), skipping")
-                    break
+
+                if resp_domain != base_domain:
+                    # Check if it's a related domain (subdomain/sibling)
+                    if UrlDiscoverer._is_related_domain(resp_domain, base_domain):
+                        # Follow the redirect — update base URL for remaining paths
+                        scheme = resp.url.split('//')[0] if '//' in resp.url else 'https:'
+                        new_base = f"{scheme}//{resp_domain}"
+                        logger.info(f"  Redirected to related domain ({resp_domain}), "
+                                    f"updating base URL to {new_base}")
+                        effective_base_url = new_base
+
+                        # Only accept if the path is meaningful (not just homepage)
+                        if len(resp_path.strip('/')) < 5:
+                            logger.info(f"  Redirected to homepage of related domain, "
+                                        f"trying remaining paths on {new_base}")
+                            continue
+                    else:
+                        # Truly unrelated domain — skip
+                        logger.info(f"  Redirected to unrelated domain ({resp_domain}), skipping")
+                        break
+
+                # Skip homepage redirects on same domain
+                if resp_domain == base_domain and len(resp_path.strip('/')) < 5:
+                    final_url = resp.url.rstrip('/')
+                    base_clean = effective_base_url.rstrip('/')
+                    if final_url == base_clean or final_url == base_clean + '/':
+                        logger.debug(f"  Redirected to homepage, trying next path")
+                        continue
+
                 response = resp
                 roster_url = url
                 break
@@ -162,10 +188,10 @@ class CollegeBaseballScraper:
         # Wait before stats request
         time.sleep(random.uniform(*self.config['between_pages_same_school']))
 
-        # Try stats URL patterns
+        # Try stats URL patterns (use effective_base_url in case roster redirected us)
         stats_response = None
         for path in STATS_PATHS:
-            url = f"{base_url}{path}" if not path.startswith('http') else path
+            url = f"{effective_base_url}{path}" if not path.startswith('http') else path
             logger.debug(f"Trying stats: {url}")
             resp = self.request_handler.get(
                 url,
@@ -175,8 +201,10 @@ class CollegeBaseballScraper:
             if resp:
                 # Skip if redirected to homepage (common on SIDEARM v3 for bad paths)
                 final_url = resp.url.rstrip('/')
-                base_clean = base_url.rstrip('/')
-                if final_url == base_clean or final_url == base_clean + '/':
+                base_clean = effective_base_url.rstrip('/')
+                orig_clean = base_url.rstrip('/')
+                if (final_url == base_clean or final_url == base_clean + '/' or
+                        final_url == orig_clean or final_url == orig_clean + '/'):
                     logger.debug(f"  Redirected to homepage, skipping: {url}")
                     continue
                 stats_response = resp
@@ -214,7 +242,7 @@ class CollegeBaseballScraper:
         # SIDEARM API fallback: for Nuxt SPA sites where stats are loaded
         # client-side only (e.g., Iowa, BYU, Nebraska, Colorado)
         if not batting_stats and not pitching_stats:
-            api_batting, api_pitching = self._try_sidearm_api_stats(base_url, roster_url)
+            api_batting, api_pitching = self._try_sidearm_api_stats(effective_base_url, roster_url)
             if api_batting:
                 batting_stats = api_batting
             if api_pitching:
