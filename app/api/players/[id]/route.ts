@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
   _req: Request,
   { params }: { params: { id: string } }
@@ -24,7 +26,9 @@ export async function GET(
       return NextResponse.json({ error: "Player not found" }, { status: 404 });
     }
 
-    return NextResponse.json(player);
+    const response = NextResponse.json(player);
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    return response;
   } catch (error) {
     console.error("Error fetching player:", error);
     return NextResponse.json(

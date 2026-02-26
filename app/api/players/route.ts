@@ -114,10 +114,12 @@ export async function GET(req: NextRequest) {
       prisma.player.count({ where }),
     ]);
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       players,
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    return response;
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     console.error("Error fetching players:", msg, error);

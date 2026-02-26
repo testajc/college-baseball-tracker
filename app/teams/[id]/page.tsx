@@ -43,7 +43,7 @@ export default function TeamDetailPage() {
   const [statView, setStatView] = useState<"hitting" | "pitching">("hitting");
 
   useEffect(() => {
-    fetch(`/api/teams/${params.id}`)
+    fetch(`/api/teams/${params.id}`, { cache: 'no-store' })
       .then((r) => {
         if (!r.ok) throw new Error("Not found");
         return r.json();

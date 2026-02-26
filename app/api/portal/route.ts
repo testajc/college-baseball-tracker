@@ -29,7 +29,9 @@ export async function GET(req: NextRequest) {
       orderBy: { portalDate: "desc" },
     });
 
-    return NextResponse.json({ players });
+    const response = NextResponse.json({ players });
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    return response;
   } catch (error) {
     console.error("Error fetching portal players:", error);
     return NextResponse.json({ error: "Failed to fetch portal players" }, { status: 500 });

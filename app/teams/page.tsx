@@ -22,7 +22,7 @@ export default function TeamsPage() {
     if (search) params.set("search", search);
     if (division) params.set("division", division);
 
-    fetch(`/api/teams?${params}`)
+    fetch(`/api/teams?${params}`, { cache: 'no-store' })
       .then((r) => r.json())
       .then((data) => setTeams(data.teams ?? []))
       .catch(() => setTeams([]))
@@ -31,7 +31,14 @@ export default function TeamsPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">Teams</h1>
+      <div className="flex items-center gap-3">
+        <h1 className="text-2xl font-bold">Teams</h1>
+        {!loading && (
+          <span className="text-sm text-muted-foreground">
+            ({teams.length}{division ? ` ${division}` : ''})
+          </span>
+        )}
+      </div>
 
       <div className="flex flex-wrap items-center gap-4">
         <SearchBar

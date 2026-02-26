@@ -21,7 +21,7 @@ export default function PortalPage() {
     const params = new URLSearchParams();
     if (division) params.set("division", division);
 
-    fetch(`/api/portal?${params}`)
+    fetch(`/api/portal?${params}`, { cache: 'no-store' })
       .then((r) => r.json())
       .then((data) => setPlayers(data.players ?? []))
       .catch(() => setPlayers([]))

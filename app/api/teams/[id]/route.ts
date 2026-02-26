@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
   _req: Request,
   { params }: { params: { id: string } }
@@ -29,7 +31,9 @@ export async function GET(
       return NextResponse.json({ error: "Team not found" }, { status: 404 });
     }
 
-    return NextResponse.json(team);
+    const response = NextResponse.json(team);
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    return response;
   } catch (error) {
     console.error("Error fetching team:", error);
     return NextResponse.json({ error: "Failed to fetch team" }, { status: 500 });

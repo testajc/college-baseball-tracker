@@ -13,7 +13,7 @@ export default function PlayerDetailPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/players/${params.id}`)
+    fetch(`/api/players/${params.id}`, { cache: 'no-store' })
       .then((r) => {
         if (!r.ok) throw new Error("Not found");
         return r.json();

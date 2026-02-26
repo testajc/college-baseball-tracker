@@ -21,7 +21,7 @@ export default function PlayersPage() {
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
-    fetch("/api/teams")
+    fetch("/api/teams", { cache: 'no-store' })
       .then((r) => r.json())
       .then((data) => setConferences(data.conferences ?? []))
       .catch(() => {});
@@ -73,7 +73,7 @@ export default function PlayersPage() {
 
     try {
       setError(null);
-      const res = await fetch(`/api/players?${params}`);
+      const res = await fetch(`/api/players?${params}`, { cache: 'no-store' });
       if (!res.ok) {
         const text = await res.text();
         setError(`API error ${res.status}: ${text.slice(0, 200)}`);

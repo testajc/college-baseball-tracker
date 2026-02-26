@@ -36,10 +36,12 @@ export async function GET(req: NextRequest) {
       orderBy: { conference: "asc" },
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       teams,
       conferences: conferences.map((c) => c.conference),
     });
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    return response;
   } catch (error) {
     console.error("Error fetching teams:", error);
     return NextResponse.json({ error: "Failed to fetch teams" }, { status: 500 });
