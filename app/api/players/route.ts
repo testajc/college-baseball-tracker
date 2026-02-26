@@ -64,43 +64,37 @@ export async function GET(req: NextRequest) {
     if (classYear) where.classYear = classYear;
     if (inPortal !== undefined) where.inPortal = inPortal;
 
-    // Hitting stat threshold filters
-    const hasHittingFilters = [minAvg, minObp, minSlg, minOps, minHR, minRBI, minSB, minXbhToK, minAB].some(v => v !== undefined);
-    if (hasHittingFilters) {
-      where.hittingStats = {
-        ...where.hittingStats as object,
-        ...(minAvg !== undefined && { avg: { gte: minAvg } }),
-        ...(minObp !== undefined && { obp: { gte: minObp } }),
-        ...(minSlg !== undefined && { slg: { gte: minSlg } }),
-        ...(minOps !== undefined && { ops: { gte: minOps } }),
-        ...(minHR !== undefined && { hr: { gte: minHR } }),
-        ...(minRBI !== undefined && { rbi: { gte: minRBI } }),
-        ...(minSB !== undefined && { sb: { gte: minSB } }),
-        ...(minXbhToK !== undefined && { xbhToK: { gte: minXbhToK } }),
-        ...(minAB !== undefined && { ab: { gte: minAB } }),
-      };
+    // Hitting stat field filters (wrapped in 'is' for proper Prisma relation filtering)
+    const hittingWhere: Prisma.HittingStatsWhereInput = {};
+    if (minAvg !== undefined) hittingWhere.avg = { gte: minAvg };
+    if (minObp !== undefined) hittingWhere.obp = { gte: minObp };
+    if (minSlg !== undefined) hittingWhere.slg = { gte: minSlg };
+    if (minOps !== undefined) hittingWhere.ops = { gte: minOps };
+    if (minHR !== undefined) hittingWhere.hr = { gte: minHR };
+    if (minRBI !== undefined) hittingWhere.rbi = { gte: minRBI };
+    if (minSB !== undefined) hittingWhere.sb = { gte: minSB };
+    if (minXbhToK !== undefined) hittingWhere.xbhToK = { gte: minXbhToK };
+    if (minAB !== undefined) hittingWhere.ab = { gte: minAB };
+
+    const hasHittingFilters = Object.keys(hittingWhere).length > 0;
+    if (hasHittingFilters || statType === "hitting") {
+      where.hittingStats = { is: hittingWhere };
     }
 
-    // Pitching stat threshold filters
-    const hasPitchingFilters = [maxEra, maxWhip, minKPer9, maxBB9, minKToBb, minWins, minSaves, minIP].some(v => v !== undefined);
-    if (hasPitchingFilters) {
-      where.pitchingStats = {
-        ...where.pitchingStats as object,
-        ...(maxEra !== undefined && { era: { lte: maxEra } }),
-        ...(maxWhip !== undefined && { whip: { lte: maxWhip } }),
-        ...(minKPer9 !== undefined && { kPer9: { gte: minKPer9 } }),
-        ...(maxBB9 !== undefined && { bbPer9: { lte: maxBB9 } }),
-        ...(minKToBb !== undefined && { kToBb: { gte: minKToBb } }),
-        ...(minWins !== undefined && { w: { gte: minWins } }),
-        ...(minSaves !== undefined && { sv: { gte: minSaves } }),
-        ...(minIP !== undefined && { ip: { gte: minIP } }),
-      };
-    }
+    // Pitching stat field filters
+    const pitchingWhere: Prisma.PitchingStatsWhereInput = {};
+    if (maxEra !== undefined) pitchingWhere.era = { lte: maxEra };
+    if (maxWhip !== undefined) pitchingWhere.whip = { lte: maxWhip };
+    if (minKPer9 !== undefined) pitchingWhere.kPer9 = { gte: minKPer9 };
+    if (maxBB9 !== undefined) pitchingWhere.bbPer9 = { lte: maxBB9 };
+    if (minKToBb !== undefined) pitchingWhere.kToBb = { gte: minKToBb };
+    if (minWins !== undefined) pitchingWhere.w = { gte: minWins };
+    if (minSaves !== undefined) pitchingWhere.sv = { gte: minSaves };
+    if (minIP !== undefined) pitchingWhere.ip = { gte: minIP };
 
-    if (statType === "hitting") {
-      where.hittingStats = { ...where.hittingStats as object, isNot: null } as Prisma.HittingStatsNullableRelationFilter;
-    } else if (statType === "pitching") {
-      where.pitchingStats = { ...where.pitchingStats as object, isNot: null } as Prisma.PitchingStatsNullableRelationFilter;
+    const hasPitchingFilters = Object.keys(pitchingWhere).length > 0;
+    if (hasPitchingFilters || statType === "pitching") {
+      where.pitchingStats = { is: pitchingWhere };
     }
 
     const [players, total] = await Promise.all([
