@@ -135,9 +135,13 @@ Full Python scraper that pulls rosters and stats from college athletics sites ac
 | `database.py` | PostgreSQL writer - saves scraped data to Prisma-compatible tables |
 | `parsers/sidearm_parser.py` | HTML + Nuxt payload + generic table-scoring parser for SIDEARM and non-SIDEARM sites |
 | `url_discovery.py` | Homepage crawler that discovers baseball roster/stats URLs when standard paths fail |
-| `browser_scraper.py` | Playwright headless browser fallback for JS-rendered pages |
+| `browser_scraper.py` | Playwright headless browser fallback for JS-rendered pages (with subprocess fallback for asyncio environments) |
 | `validate_schools.py` | Classifies failed schools, discovers correct URLs from conference sites, fixes CSV |
-| `build_schools_db.py` | Builds `schools_database.csv` (971 schools across D1/D2/D3) |
+| `build_schools_db.py` | Builds `schools_database.csv` from hardcoded known schools |
+| `scrape_ncsa.py` | Playwright scraper for NCSA D1/D2/D3 division pages (~941 schools) |
+| `scrape_wikipedia.py` | BeautifulSoup scraper for Wikipedia D1/D2 program tables (~559 schools) |
+| `build_master_list.py` | Cross-references NCSA, Wikipedia, and CSV with fuzzy name matching; updates CSV |
+| `backfill_teams.py` | Ensures every school in CSV exists as a team in DB (even with 0 players) |
 
 ### How Stats Parsing Works
 
@@ -235,21 +239,31 @@ Daily scrape runs via `.github/workflows/daily-scrape.yml`:
 
 | Table | Count |
 |-------|-------|
-| Teams | ~977 |
-| Players | ~20,000+ |
+| Teams | 1,396 |
+| Players | ~20,662 |
 | Hitting Stats | ~7,000+ |
 | Pitching Stats | ~5,000+ |
 
-| Division | Teams (scraped/total) | Coverage |
-|----------|----------------------|----------|
-| D1 | ~131/268 | ~49% |
-| D2 | ~230/282 | ~82% |
-| D3 | ~316/421 | ~75% |
-| **Total** | **~977/971** | **~100%** |
+| Division | Teams | Players | Coverage |
+|----------|-------|---------|----------|
+| D1 | 504 | 7,970 | 100% |
+| D2 | 373 | 6,864 | 100% |
+| D3 | 519 | 5,828 | 100% |
+| **Total** | **1,396** | **20,662** | **100%** |
 
-Note: Team count exceeds CSV total because some schools have multiple entries or were added via redirect domains. The ~128 remaining missing schools are dead domains not recoverable from conference sites. ~23 have corrected URLs but need Playwright for JS-rendered rosters.
+Note: Team count exceeds NCSA target (~953) because the CSV includes schools from multiple sources (NCSA, Wikipedia, conference sites, manual additions). All NCSA-listed programs are now in the DB. Teams without roster data show as empty rosters on the website.
 
 ## Recent Changes
+
+### Session 7 (Feb 26, 2026) - 100% Team Coverage via NCSA/Wikipedia Scraping
+1. **`scrape_ncsa.py`** (new) - Playwright scraper for NCSA division pages. Parses Schema.org `CollegeOrUniversity` markup. Result: D1 308, D2 251, D3 382 = 941 schools.
+2. **`scrape_wikipedia.py`** (new) - BeautifulSoup scraper for Wikipedia D1/D2 program tables. Result: D1 305, D2 254 = 559 schools.
+3. **`build_master_list.py`** (new) - Cross-references NCSA, Wikipedia, and existing CSV using multi-key fuzzy matching (`thefuzz`). Handles full-name↔abbreviation mapping (e.g., "Brigham Young University" ↔ "BYU"). Added 201 new schools to CSV.
+4. **`backfill_teams.py`** (new) - Reads CSV and upserts every team into DB via `database.py:upsert_team()`. Teams with 0 players show as empty rosters. Backfilled 201 teams in <1 second.
+5. **Fixed cross-domain redirect skipping** in `main.py` - Redirects to related domains (e.g., `hope.edu` → `athletics.hope.edu`) now follow the redirect and update `effective_base_url` for remaining URL paths, instead of breaking the loop.
+6. **Playwright subprocess fallback** in `browser_scraper.py` - When `sync_playwright()` fails with asyncio error (GitHub Actions), spawns a fresh Python subprocess per school. URLs passed safely via `sys.argv` JSON.
+7. **GitHub Actions workflow** updated - Added Playwright install, NCSA scrape, master list build, and team backfill steps before the main scraper run.
+8. **DB result** - 1,396 teams (D1: 504, D2: 373, D3: 519), 20,662 players. 100% coverage across all divisions.
 
 ### Session 6 (Feb 23-24, 2026) - Stale Players, Cross-Domain Stats, SIDEARM API, Workflow Fix
 1. **Stale player cleanup** in `database.py` - `save_school_data()` now tracks upserted player IDs and deletes players no longer on the current roster via `_cleanup_stale_players()`. Cleans `email_notifications` (no CASCADE) then players (CASCADE handles stats, favorites, portal_alerts). Safety guard: skips cleanup if scraper returns 0 players.
@@ -315,8 +329,7 @@ Note: Team count exceeds CSV total because some schools have multiple entries or
 
 ## Next Steps / Ideas
 
-1. **Install Playwright in GitHub Actions** - Would recover ~14 JS-rendered sites via browser fallback
-2. **WMT Games integration** - Handle Vanderbilt/LSU-style sites (headless browser or API)
+1. **WMT Games integration** - Handle Vanderbilt/LSU-style sites (headless browser or API)
 3. **Portal alerts** - Test and verify email notification system works
 4. **Player comparison** - Add ability to compare multiple players side-by-side
 5. **Export functionality** - Export filtered results to CSV
@@ -327,6 +340,8 @@ Note: Team count exceeds CSV total because some schools have multiple entries or
 ## Git History (Recent)
 
 ```
+20919aa Fix NCSA scraper extraction and improve school name matching
+5588605 Add NCSA/Wikipedia scrapers, team backfill, and redirect fix for 100% coverage
 05d7680 Fix workflow timeout: seed with today's date, reduce inter-school delays
 85661fe Add scrape history seeding from DB when artifact expires
 15cf576 Fix stale players, cross-domain stats discovery, and SIDEARM API fallback
