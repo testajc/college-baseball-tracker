@@ -538,23 +538,30 @@ class CollegeBaseballScraper:
     def run_recover(self, dry_run: bool = False):
         """Re-attempt scraping on schools that previously failed.
 
-        Targets schools that are in the scheduler's history as "scraped" but
-        have no players in the DB, or schools that were never scraped due to
-        errors (not in DB at all despite being in scrape_history).
+        Targets:
+        1. Schools not in DB at all (never scraped)
+        2. Schools in DB but with 0 players (backfilled but never successfully scraped)
         """
         logger.info("Recovery mode: finding failed schools to retry")
 
         all_schools = self.scheduler.schools
         already_in_db = self.db.get_schools_in_db()
+        schools_with_players = self.db.get_schools_with_players()
 
-        # Find schools not in DB (either never scraped or scraped with 0 players)
-        failed_schools = [s for s in all_schools if s['school_name'] not in already_in_db]
+        # Find schools not in DB OR in DB but with no players
+        not_in_db = [s for s in all_schools if s['school_name'] not in already_in_db]
+        no_players = [s for s in all_schools
+                      if s['school_name'] in already_in_db
+                      and s['school_name'] not in schools_with_players]
+
+        failed_schools = not_in_db + no_players
 
         if not failed_schools:
-            logger.info("No failed schools to recover — all schools are in DB")
+            logger.info("No failed schools to recover — all schools have players")
             return
 
-        logger.info(f"Found {len(failed_schools)} schools not in DB")
+        logger.info(f"Found {len(failed_schools)} schools to recover "
+                    f"({len(not_in_db)} not in DB, {len(no_players)} with 0 players)")
 
         if dry_run:
             logger.info("DRY RUN - would attempt recovery on:")

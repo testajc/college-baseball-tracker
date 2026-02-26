@@ -403,6 +403,17 @@ class DatabaseManager:
             cur.execute("SELECT name FROM teams")
             return {row[0] for row in cur.fetchall()}
 
+    def get_schools_with_players(self) -> set:
+        """Return set of school names that have at least one player.
+        Used by recover to find teams that were backfilled but never scraped."""
+        conn = self._get_conn()
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT DISTINCT t.name FROM teams t
+                INNER JOIN players p ON p.team_id = t.id
+            """)
+            return {row[0] for row in cur.fetchall()}
+
     def save_school_data(self, result: dict):
         """Save a full school scrape result to the database"""
         school_name = result['school']
