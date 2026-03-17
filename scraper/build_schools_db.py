@@ -1224,10 +1224,25 @@ KNOWN_SCHOOLS: List[Dict] = [
 
 
 def build_database(verify: bool = False):
-    """Build the schools database CSV from known schools"""
+    """Build the schools database CSV, merging with existing CSV if present.
+
+    If schools_database.csv already exists (e.g., expanded by NCSA/Wikipedia),
+    only add new hardcoded schools that aren't already in the CSV.
+    Never remove schools that were added from other sources.
+    """
     logger.info(f"Building schools database with {len(KNOWN_SCHOOLS)} known schools...")
 
-    schools = []
+    # Load existing CSV if present
+    existing_schools = {}
+    if OUTPUT_FILE.exists():
+        with open(OUTPUT_FILE, 'r', newline='', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                existing_schools[row['school_name']] = row
+        logger.info(f"Existing CSV has {len(existing_schools)} schools")
+
+    # Build known schools dict
+    known_schools = {}
     for entry in KNOWN_SCHOOLS:
         school = {
             'school_name': entry['school_name'],
@@ -1239,7 +1254,29 @@ def build_database(verify: bool = False):
             'last_scraped': '',
             'scrape_priority': {'D1': 'high', 'D2': 'medium', 'D3': 'low'}.get(entry['division'], 'low'),
         }
-        schools.append(school)
+        known_schools[entry['school_name']] = school
+
+    if existing_schools:
+        # Merge: keep all existing, add new from hardcoded, update URLs for known schools
+        merged = dict(existing_schools)
+        added = 0
+        for name, school in known_schools.items():
+            if name not in merged:
+                merged[name] = school
+                added += 1
+            else:
+                # Update athletics URL and custom URLs from hardcoded list
+                # (hardcoded list has manually verified URLs)
+                merged[name]['athletics_base_url'] = school['athletics_base_url']
+                if school.get('roster_url') != '/sports/baseball/roster':
+                    merged[name]['roster_url'] = school['roster_url']
+                if school.get('stats_url') != '/sports/baseball/stats':
+                    merged[name]['stats_url'] = school['stats_url']
+        schools = list(merged.values())
+        logger.info(f"Merged: {len(existing_schools)} existing + {added} new = {len(schools)} total")
+    else:
+        # No existing CSV — write from scratch
+        schools = list(known_schools.values())
 
     # Sort: D1 first, then D2, then D3, then by name
     schools.sort(key=lambda x: ({'D1': 0, 'D2': 1, 'D3': 2}.get(x['division'], 3), x['school_name']))
@@ -1254,7 +1291,7 @@ def build_database(verify: bool = False):
     d2 = len([s for s in schools if s['division'] == 'D2'])
     d3 = len([s for s in schools if s['division'] == 'D3'])
 
-    logger.info(f"Wrote {len(schools)} schools to {OUTPUT_FILE}")
+    logger.info(f"Updated {OUTPUT_FILE} with {len(schools)} total schools")
     logger.info(f"  D1: {d1} schools")
     logger.info(f"  D2: {d2} schools")
     logger.info(f"  D3: {d3} schools")

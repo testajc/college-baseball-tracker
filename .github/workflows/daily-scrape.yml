@@ -85,11 +85,27 @@ jobs:
 
       - name: Download previous progress
         if: steps.season_check.outputs.skip != 'true' || github.event.inputs.force == 'true'
-        uses: actions/download-artifact@v4
-        with:
-          name: scrape-progress
-          path: scraper/
-        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd scraper
+          echo "Downloading scrape_history.json from most recent previous run..."
+          # gh run list only returns completed runs, so the current (running) run won't appear
+          RUN_ID=$(gh run list --workflow daily-scrape.yml --status success --limit 1 --json databaseId \
+            --jq '.[0].databaseId' -R ${{ github.repository }})
+          if [ -n "$RUN_ID" ]; then
+            gh run download "$RUN_ID" -n scrape-progress -D /tmp/scrape-dl -R ${{ github.repository }} && {
+              # gh run download extracts into the download dir (may create subdirectory)
+              find /tmp/scrape-dl -name scrape_history.json -exec cp {} . \;
+              if [ -f scrape_history.json ]; then
+                echo "Downloaded scrape_history.json from run $RUN_ID"
+              else
+                echo "Artifact downloaded but scrape_history.json not found inside"
+              fi
+            } || echo "Failed to download artifact from run $RUN_ID"
+          else
+            echo "No previous successful run found"
+          fi
 
       - name: Seed scrape history from DB if artifact missing
         if: steps.season_check.outputs.skip != 'true' || github.event.inputs.force == 'true'
@@ -98,23 +114,24 @@ jobs:
         run: |
           cd scraper
           if [ ! -f scrape_history.json ]; then
-            echo "scrape_history.json missing (artifact expired?) — seeding from DB"
+            echo "scrape_history.json missing — seeding from DB with stale date to trigger updates"
             python -c "
           import json
-          from datetime import date
+          from datetime import date, timedelta
           from database import DatabaseManager
           db = DatabaseManager()
           teams = db.get_schools_in_db()
           db.close()
           if teams:
-              today = date.today().isoformat()
+              # Use 4 days ago so scheduler considers all schools due
+              stale_date = (date.today() - timedelta(days=4)).isoformat()
               history = {
                   'initial_scrape_complete': True,
-                  'last_scraped': {name: today for name in teams}
+                  'last_scraped': {name: stale_date for name in teams}
               }
               with open('scrape_history.json', 'w') as f:
                   json.dump(history, f, indent=2)
-              print(f'Seeded scrape_history.json with {len(teams)} teams (last_scraped={today})')
+              print(f'Seeded scrape_history.json with {len(teams)} teams (last_scraped={stale_date})')
           else:
               print('DB has no teams — starting fresh initial scrape')
           "
@@ -143,16 +160,15 @@ jobs:
           s = SmartScheduler()
           in_db = db.get_schools_in_db()
           schools = s.get_schools_to_scrape_today()
-          remaining = [x for x in schools if x['school_name'] not in in_db]
-          d1 = [x for x in remaining if x.get('division') == 'D1']
-          d2 = [x for x in remaining if x.get('division') == 'D2']
-          d3 = [x for x in remaining if x.get('division') == 'D3']
+          d1 = [x for x in schools if x.get('division') == 'D1']
+          d2 = [x for x in schools if x.get('division') == 'D2']
+          d3 = [x for x in schools if x.get('division') == 'D3']
+          group = 'A' if s._get_todays_group() == 0 else 'B'
           report = []
           report.append(f'Teams in DB: {len(in_db)}')
-          report.append(f'Sample DB teams: {sorted(list(in_db))[:10]}')
-          report.append(f'Scheduler returned: {len(schools)}')
-          report.append(f'After DB checkpoint: {len(remaining)} (D1={len(d1)} D2={len(d2)} D3={len(d3)})')
-          report.append(f'First 20 to scrape: {[x[\"school_name\"]+\" (\"+x.get(\"division\",\"?\")+\")\" for x in remaining[:20]]}')
+          report.append(f'Today: Group {group}')
+          report.append(f'Scheduler returned: {len(schools)} (D1={len(d1)} D2={len(d2)} D3={len(d3)})')
+          report.append(f'First 20 to scrape: {[x[\"school_name\"]+\" (\"+x.get(\"division\",\"?\")+\")\" for x in schools[:20]]}')
           text = '\n'.join(report)
           print(text)
           open('/tmp/debug_checkpoint.txt', 'w').write(text)

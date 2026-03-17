@@ -12,18 +12,9 @@ logger = logging.getLogger(__name__)
 
 class SmartScheduler:
     """
-    Determines which schools to scrape each day based on:
-    - Division priority (D1 > D2 > D3)
-    - Last scrape time
-    - Day of week rotation
+    Splits all schools into two groups (A/B) and alternates daily.
+    Every school gets scraped every 2 days.
     """
-
-    # How often each division should be updated
-    UPDATE_FREQUENCY = {
-        'D1': 1,  # Every day
-        'D2': 2,  # Every 2 days
-        'D3': 3,  # Every 3 days
-    }
 
     def __init__(self, schools_db_path: str = None):
         if schools_db_path is None:
@@ -43,7 +34,9 @@ class SmartScheduler:
         with open(p, 'r', newline='', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for row in reader:
-                schools.append(row)
+                # Skip schools with no athletics URL (unscrappable NCSA junk)
+                if row.get('athletics_base_url', '').strip():
+                    schools.append(row)
         logger.info(f"Loaded {len(schools)} schools from database")
         return schools
 
@@ -80,19 +73,38 @@ class SmartScheduler:
 
         return False
 
-    def get_schools_to_scrape_today(self) -> List[Dict]:
-        """Get list of schools that should be scraped today"""
-        today = date.today()
+    def _get_todays_group(self) -> int:
+        """Return 0 or 1 based on today's date (alternates daily)"""
+        return date.today().toordinal() % 2
 
-        # If initial scrape not complete, return unscraped schools
+    def get_schools_to_scrape_today(self) -> List[Dict]:
+        """Get list of schools that should be scraped today.
+
+        Splits all schools into two halves (sorted alphabetically).
+        Even days scrape group 0 (indices 0, 2, 4, ...),
+        odd days scrape group 1 (indices 1, 3, 5, ...).
+        """
+        # If initial scrape not complete, return unscraped schools (all of them)
         if not self.is_initial_scrape_complete():
             return self._get_initial_scrape_batch()
 
-        # Otherwise, use smart rotation
-        return self._get_daily_update_batch(today)
+        # Sort alphabetically for a stable, deterministic split
+        sorted_schools = sorted(self.schools, key=lambda x: x['school_name'])
+        group = self._get_todays_group()
+
+        # Select every other school based on today's group
+        todays_schools = [s for i, s in enumerate(sorted_schools) if i % 2 == group]
+
+        # Prioritize D1 > D2 > D3 within today's group
+        todays_schools.sort(key=lambda x: {'D1': 0, 'D2': 1, 'D3': 2}.get(x.get('division', ''), 3))
+
+        logger.info(f"Today is group {'A' if group == 0 else 'B'}: "
+                    f"{len(todays_schools)} schools to scrape")
+
+        return todays_schools
 
     def _get_initial_scrape_batch(self) -> List[Dict]:
-        """Get next batch for initial scrape (100 schools)"""
+        """Get next batch for initial scrape"""
         scraped = set(self.scrape_history['last_scraped'].keys())
         unscraped = [s for s in self.schools if s['school_name'] not in scraped]
 
@@ -103,33 +115,6 @@ class SmartScheduler:
         max_schools = INITIAL_SCRAPE_CONFIG['max_schools_per_day']
 
         return unscraped[:max_schools]
-
-    def _get_daily_update_batch(self, today: date) -> List[Dict]:
-        """Get schools for daily update based on rotation"""
-        schools_to_scrape = []
-
-        for school in self.schools:
-            division = school.get('division', '')
-            frequency = self.UPDATE_FREQUENCY.get(division, 3)
-
-            # Check when last scraped
-            last_scraped_str = self.scrape_history['last_scraped'].get(school['school_name'])
-
-            if last_scraped_str:
-                last_scraped = date.fromisoformat(last_scraped_str)
-                days_since = (today - last_scraped).days
-
-                # Scrape if enough days have passed
-                if days_since >= frequency:
-                    schools_to_scrape.append(school)
-            else:
-                # Never scraped - add it
-                schools_to_scrape.append(school)
-
-        # Sort by priority: D1 first (most important to be fresh)
-        schools_to_scrape.sort(key=lambda x: {'D1': 0, 'D2': 1, 'D3': 2}.get(x.get('division', ''), 3))
-
-        return schools_to_scrape
 
     def get_scrape_config(self) -> Dict:
         """Get appropriate config based on scrape phase"""
@@ -175,20 +160,24 @@ class SmartScheduler:
         d2_pct = (100 * d2_scraped / d2_total) if d2_total else 0
         d3_pct = (100 * d3_scraped / d3_total) if d3_total else 0
 
-        today_count = len(self.get_schools_to_scrape_today())
+        group = self._get_todays_group()
+        sorted_schools = sorted(self.schools, key=lambda x: x['school_name'])
+        today_count = len([s for i, s in enumerate(sorted_schools) if i % 2 == group])
 
         report = f"""
 ========================================
 SCRAPER STATUS REPORT
 ========================================
 Phase: {phase}
+Schedule: Half the teams daily (Group A/B alternating)
+Today: Group {'A' if group == 0 else 'B'}
 
 Overall Progress: {scraped_schools}/{total_schools} schools ({pct:.1f}%)
 
 By Division:
-  D1: {d1_scraped}/{d1_total} ({d1_pct:.1f}%) - Updated daily
-  D2: {d2_scraped}/{d2_total} ({d2_pct:.1f}%) - Updated every 2 days
-  D3: {d3_scraped}/{d3_total} ({d3_pct:.1f}%) - Updated every 3 days
+  D1: {d1_scraped}/{d1_total} ({d1_pct:.1f}%)
+  D2: {d2_scraped}/{d2_total} ({d2_pct:.1f}%)
+  D3: {d3_scraped}/{d3_total} ({d3_pct:.1f}%)
 
 Schools to scrape today: {today_count}
 ========================================
