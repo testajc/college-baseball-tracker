@@ -14,10 +14,10 @@ North Carolina State,D1,ACC,https://gopack.com,/sports/baseball/roster,/sports/b
 Arizona State,D1,Big 12,https://thesundevils.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Texas,D1,SEC,https://texassports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 UL Monroe,D1,Sun Belt,https://ulmwarhawks.com,/sports/baseball/roster,/sports/baseball/stats,,high
-UTSA,D1,,,/sports/baseball/roster,/sports/baseball/stats,,high
+UTSA,D1,,https://goutsa.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Texas A&M,D1,SEC,https://12thman.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Miami,D1,ACC,https://miamihurricanes.com,/sports/baseball/roster,/sports/baseball/stats,,high
-East Tennessee State,D1,Southern Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+East Tennessee State,D1,Southern Conference,https://etsubucs.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Kansas State,D1,Big 12,https://kstatesports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 New Mexico,D1,MWC,https://golobos.com,/sports/baseball/roster,/sports/baseball/stats,,high
 West Virginia,D1,Big 12,https://wvusports.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -37,9 +37,9 @@ Charlotte,D1,AAC,https://charlotte49ers.com,/sports/baseball/roster,/sports/base
 Cincinnati,D1,Big 12,https://gobearcats.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Nebraska,D1,Big Ten,https://huskers.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Texas Southern,D1,SWAC,https://tsusports.com,/sports/baseball/roster,/sports/baseball/stats,,high
-California Baptist,D1,,,/sports/baseball/roster,/sports/baseball/stats,,high
+California Baptist,D1,,https://cbulancers.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Kentucky,D1,SEC,https://ukathletics.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Davidson,D1,Atlantic 10 Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+Davidson,D1,Atlantic 10 Conference,https://davidsonwildcats.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Southern Indiana,D1,GLVC,https://gouscreamingeagles.com,/sports/baseball/roster,/sports/baseball/stats,,high
 UT Martin,D1,OVC,https://utmsports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Nevada,D1,MWC,https://nevadawolfpack.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -52,7 +52,7 @@ Incarnate Word,D1,Southland,https://uiwcardinals.com,/sports/baseball/roster,/sp
 Oregon,D1,Big Ten,https://goducks.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Lipscomb,D1,ASUN,https://lipscombsports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Jackson State,D1,SWAC,https://gojsutigers.com,/sports/baseball/roster,/sports/baseball/stats,,high
-James Madison,D1,Sun Belt Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+James Madison,D1,Sun Belt Conference,https://jmusports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Marshall,D1,Sun Belt,https://herdzone.com,/sports/baseball/roster,/sports/baseball/stats,,high
 LIU Brooklyn,D1,NEC,https://liuathletics.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Purdue,D1,Big Ten,https://purduesports.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -61,7 +61,7 @@ UC Santa Barbara,D1,Big West,https://ucsbgauchos.com,/sports/baseball/roster,/sp
 Jacksonville,D1,ASUN,https://judolphins.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Eastern Illinois,D1,OVC,https://eiupanthers.com,/sports/baseball/roster,/sports/baseball/stats,,high
 California,D1,ACC,https://calbears.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Southeast Missouri State,D1,Ohio Valley Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+Southeast Missouri State,D1,Ohio Valley Conference,https://semoredhawks.com,/sports/baseball/roster,,,high
 UCLA,D1,Big Ten,https://uclabruins.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Old Dominion,D1,Sun Belt,https://odusports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Florida,D1,SEC,https://floridagators.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -70,15 +70,15 @@ Florida State,D1,ACC,https://seminoles.com,/sports/baseball/roster,/sports/baseb
 Houston,D1,Big 12,https://uhcougars.com,/sports/baseball/roster,/sports/baseball/stats,,high
 New Orleans,D1,Southland,https://unoprivateers.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Virginia,D1,ACC,https://virginiasports.com,/sports/baseball/roster,/sports/baseball/stats,,high
-South Carolina Upstate,D1,Big South Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+South Carolina Upstate,D1,Big South Conference,https://upstatespartans.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Missouri State,D1,MVC,https://missouristatebears.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Miami (OH),D1,MAC,https://miamiredhawks.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Morehead State,D1,OVC,https://msueagles.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Wofford,D1,SoCon,https://woffordterriers.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Manhattan,D1,MAAC,https://gojaspers.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Florida Atlantic,D1,American Athletic Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+Florida Atlantic,D1,American Athletic Conference,https://fausports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 UNC Wilmington,D1,CAA,https://uncwsports.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Stephen F. Austin State,D1,Southland Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+Stephen F. Austin State,D1,Southland Conference,https://sfajacks.com,/sports/baseball/roster,/sports/baseball/stats,,high
 UNC Asheville,D1,Big South,https://uncabulldogs.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Wake Forest,D1,ACC,https://godeacs.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Central Michigan,D1,MAC,https://cmuchippewas.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -90,9 +90,9 @@ Appalachian State,D1,Sun Belt,https://appstatesports.com,/sports/baseball/roster
 UNC Greensboro,D1,SoCon,https://uncgspartans.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Jacksonville State,D1,C-USA,https://jsugamecocksports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 VMI,D1,SoCon,https://vmikeydets.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Bethune-Cookman,D1,Southwestern Athletic Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+Bethune-Cookman,D1,Southwestern Athletic Conference,https://bcuathletics.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Rider,D1,MAAC,https://gobroncs.com,/sports/baseball/roster,/sports/baseball/stats,,high
-UAB,D1,,,/sports/baseball/roster,/sports/baseball/stats,,high
+UAB,D1,,https://uabsports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Air Force,D1,MWC,https://goairforcefalcons.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Monmouth,D1,CAA,https://monmouthhawks.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Ole Miss,D1,SEC,https://olemisssports.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -100,7 +100,7 @@ Grambling State,D1,SWAC,https://gsutigers.com,/sports/baseball/roster,/sports/ba
 Arkansas,D1,SEC,https://arkansasrazorbacks.com,/sport/m-basebl/roster/,https://arkansasrazorbacks.com/stats/baseball/2026/teamcume.htm,,high
 Texas State,D1,Sun Belt,https://txstatebobcats.com,/sports/baseball/roster,/sports/baseball/stats,,high
 George Washington,D1,A-10,https://gwsports.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Little Rock,D1,Ohio Valley Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+Little Rock,D1,Ohio Valley Conference,https://lrtrojans.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Central Connecticut State,D1,NEC,https://ccsubluedevils.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Murray State,D1,OVC,https://goracers.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Northwestern State,D1,Southland,https://naborssports.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -108,13 +108,13 @@ Central Florida,D1,Big 12,https://ucfknights.com,/sports/baseball/roster,/sports
 Le Moyne,D1,NEC,https://lemoynedolphins.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Charleston Southern,D1,Big South,https://csusports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Houston Christian,D1,Southland,https://hcuhuskies.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Northern Colorado,D1,Big Sky Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+Northern Colorado,D1,Big Sky Conference,https://uncbears.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Cal Poly,D1,Big West,https://gopoly.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Belmont,D1,OVC,https://belmontbruins.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Maryland Eastern Shore,D1,Mid-Eastern Athletic Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+Maryland Eastern Shore,D1,Mid-Eastern Athletic Conference,https://umeshawksports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 High Point,D1,Big South,https://highpointpanthers.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Tennessee,D1,SEC,https://utsports.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Austin Peay,D1,Atlantic Sun Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+Austin Peay,D1,Atlantic Sun Conference,https://letsgopeay.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Maryland,D1,Big Ten,https://umterps.com,/sports/baseball/roster,/sports/baseball/stats,,high
 UMBC,D1,America East,https://umbcretrievers.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Oklahoma State,D1,Big 12,https://okstate.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -127,12 +127,12 @@ Western Kentucky,D1,C-USA,https://wkusports.com,/sports/baseball/roster,/sports/
 Minnesota,D1,Big Ten,https://gophersports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Stanford,D1,ACC,https://gostanford.com,/sports/baseball/roster,/sports/baseball/stats,,high
 USC,D1,Big Ten,https://usctrojans.com,/sports/baseball/roster,/sports/baseball/stats,,high
-CSU Bakersfield,D1,,,/sports/baseball/roster,/sports/baseball/stats,,high
+CSU Bakersfield,D1,,https://gorunners.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Southeastern Louisiana,D1,Southland,https://lionsports.net,/sports/baseball/roster,/sports/baseball/stats,,high
 San Diego State,D1,MWC,https://goaztecs.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Duke,D1,ACC,https://goduke.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Western Carolina,D1,SoCon,https://catamountsports.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Mount St. Mary's,D1,Metro Atlantic Athletic Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+Mount St. Mary's,D1,Metro Atlantic Athletic Conference,https://mountathletics.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Georgetown,D1,Big East,https://guhoyas.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Utah,D1,Big 12,https://utahutes.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Brown,D1,Ivy,https://brownbears.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -146,10 +146,10 @@ Utah Tech,D1,Western Athletic Conference,https://uttechtrailblazers.com,/sports/
 Lamar,D1,Southland,https://lamarcardinals.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Abilene Christian,D1,WAC,https://acusports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Ohio,D1,MAC,https://ohiobobcats.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Arkansas State,D1,,,/sports/baseball/roster,/sports/baseball/stats,,high
+Arkansas State,D1,,https://astateredwolves.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Utah Valley,D1,WAC,https://gouvu.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Wagner,D1,NEC,https://wagnerathletics.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Alabama A&M,D1,Southwestern Athletic Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+Alabama A&M,D1,Southwestern Athletic Conference,https://aamusports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Valparaiso,D1,MVC,https://valpoathletics.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Creighton,D1,Big East,https://gocreighton.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Texas A&M-Corpus Christi,D1,Southland,https://goislanders.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -159,16 +159,16 @@ Eastern Kentucky,D1,ASUN,https://ekusports.com,/sports/baseball/roster,/sports/b
 Connecticut,D1,Big East,https://uconnhuskies.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Southern Illinois,D1,MVC,https://siusalukis.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Washington,D1,Big Ten,https://gohuskies.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Siena,D1,Metro Atlantic Athletic Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
-Saint Joseph's,D1,Atlantic 10 Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+Siena,D1,Metro Atlantic Athletic Conference,https://sienasaints.com,/sports/baseball/roster,/sports/baseball/stats,,high
+Saint Joseph's,D1,Atlantic 10 Conference,https://sjuhawks.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Winthrop,D1,Big South,https://winthropeagles.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Alabama,D1,SEC,https://rolltide.com,/sports/baseball/roster,/sports/baseball/stats,,high
-UMass,D1,,,/sports/baseball/roster,/sports/baseball/stats,,high
+UMass,D1,,https://umassathletics.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Stetson,D1,ASUN,https://gohatters.com,/sports/baseball/roster,/sports/baseball/stats,,high
 UMass Lowell,D1,America East,https://goriverhawks.com,/sports/baseball/roster,/sports/baseball/stats,,high
 St. Louis,D1,A-10,https://slubillikens.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Baylor,D1,Big 12,https://baylorbears.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Fordham,D1,Atlantic 10 Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+Fordham,D1,Atlantic 10 Conference,https://fordhamsports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 George Mason,D1,A-10,https://gomason.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Butler,D1,Big East,https://butlersports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Southern,D1,SWAC,https://gojagsports.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -183,12 +183,12 @@ Samford,D1,SoCon,https://samfordsports.com,/sports/baseball/roster,/sports/baseb
 Indiana,D1,Big Ten,https://iuhoosiers.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Omaha,D1,Summit,https://omavs.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Oregon State,D1,Big Ten,https://osubeavers.com,/sports/baseball/roster,/sports/baseball/stats,,high
-North Florida,D1,Atlantic Sun Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+North Florida,D1,Atlantic Sun Conference,https://unfospreys.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Troy,D1,Sun Belt,https://troytrojans.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Prairie View A&M,D1,SWAC,https://pvpanthers.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Campbell,D1,Big South,https://gocamels.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Nicholls State,D1,Southland,https://geauxcolonels.com,/sports/baseball/roster,/sports/baseball/stats,,high
-St. Bonaventure,D1,Atlantic 10 Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+St. Bonaventure,D1,Atlantic 10 Conference,https://gobonnies.com,/sports/baseball/roster,/sports/baseball/stats,,high
 SIU Edwardsville,D1,OVC,https://siuecougars.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Columbia,D1,Ivy,https://gocolumbialions.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Bellarmine,D1,DII Independent,https://bellarmineknights.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -202,10 +202,10 @@ Northern Illinois,D1,MAC,https://niuhuskies.com,/sports/baseball/roster,/sports/
 Gonzaga,D1,WCC,https://gozags.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Louisiana,D1,Sun Belt,https://ragincajuns.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Portland,D1,WCC,https://portlandpilots.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Towson,D1,Colonial Athletic Association,,/sports/baseball/roster,/sports/baseball/stats,,high
+Towson,D1,Colonial Athletic Association,https://towsontigers.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Coastal Carolina,D1,Sun Belt,https://goccusports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Kennesaw State,D1,ASUN,https://ksuowls.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Akron,D1,Mid-American Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+Akron,D1,Mid-American Conference,https://gozips.com,/sports/baseball/roster,/sports/baseball/stats,,high
 The Citadel,D1,SoCon,https://citadelsports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Rhode Island,D1,A-10,https://gorhody.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Milwaukee,D1,Horizon,https://mkepanthers.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -214,12 +214,12 @@ Arizona,D1,Big 12,https://arizonawildcats.com,/sports/baseball/roster,/sports/ba
 Ball State,D1,MAC,https://ballstatesports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Boston College,D1,ACC,https://bceagles.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Liberty,D1,C-USA,https://libertyflames.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Tennessee Tech,D1,,,/sports/baseball/roster,/sports/baseball/stats,,high
+Tennessee Tech,D1,,https://www.ttusports.com,/sports/baseball/roster,/sports/bsb/2025-26/teams/tennesseetech?view=lineup,,high
 Northern Kentucky,D1,Horizon,https://nkunorse.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Navy,D1,AAC,https://navysports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Quinnipiac,D1,MAAC,https://quinnipiacbobcats.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Georgia State,D1,Sun Belt,https://georgiastatesports.com,/sports/baseball/roster,/sports/baseball/stats,,high
-UT Arlington,D1,Western Athletic Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+UT Arlington,D1,Western Athletic Conference,https://utamavs.com,/sports/baseball/roster,/sports/baseball/stats,,high
 University of New Haven,D1,NE10,https://newhavenchargers.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Niagara,D1,MAAC,https://purpleeagles.com,/sports/baseball/roster,/sports/baseball/stats,,high
 VCU,D1,A-10,https://vcuathletics.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -228,7 +228,7 @@ Presbyterian,D1,Big South,https://gobluehose.com,/sports/baseball/roster,/sports
 Florida International,D1,C-USA,https://fiusports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Indiana State,D1,MVC,https://gosycamores.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Northwestern,D1,Big Ten,https://nusports.com,/sports/baseball/roster,/sports/baseball/stats,,high
-UT Rio Grande Valley,D1,Western Athletic Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+UT Rio Grande Valley,D1,Western Athletic Conference,https://goutrgv.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Hofstra,D1,CAA,https://gohofstra.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Penn State,D1,Big Ten,https://gopsusports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Tulane,D1,AAC,https://tulanegreenwave.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -242,12 +242,12 @@ Oral Roberts,D1,Summit,https://oruathletics.com,/sports/baseball/roster,/sports/
 TCU,D1,Big 12,https://gofrogs.com,/sports/baseball/roster,/sports/baseball/stats,,high
 UC Riverside,D1,Big West,https://gohighlanders.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Long Beach State,D1,Big West,https://longbeachstate.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Sacramento State,D1,,,/sports/baseball/roster,/sports/baseball/stats,,high
+Sacramento State,D1,,https://hornetsports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Lindenwood,D1,MIAA,https://lindenwoodlions.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Villanova,D1,Big East,https://villanova.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Iona,D1,MAAC,https://icgaels.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Delaware,D1,CAA,https://bluehens.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Bryant,D1,American East Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+Bryant,D1,American East Conference,https://bryantbulldogs.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Rice,D1,AAC,https://riceowls.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Northeastern,D1,CAA,https://nuhuskies.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Washington State,D1,Pac-12,https://wsucougars.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -258,7 +258,7 @@ South Dakota State,D1,Summit,https://gojacks.com,/sports/baseball/roster,/sports
 UC Irvine,D1,Big West,https://ucirvinesports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 La Salle,D1,A-10,https://goexplorers.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Oakland,D1,Horizon,https://goldengrizzlies.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Florida A&M,D1,Southwestern Athletic Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+Florida A&M,D1,Southwestern Athletic Conference,https://famuathletics.com,/sports/baseball/roster,/sports/baseball/stats,,high
 William & Mary,D1,CAA,https://tribeathletics.com,/sports/baseball/roster,/sports/baseball/stats,,high
 North Carolina A&T,D1,ACC,https://goheels.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Lehigh,D1,Patriot,https://lehighsports.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -266,15 +266,15 @@ Xavier,D1,Big East,https://goxavier.com,/sports/baseball/roster,/sports/baseball
 Hawaii,D1,Big West,https://hawaiiathletics.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Ohio State,D1,Big Ten,https://ohiostatebuckeyes.com,/sports/baseball/roster,/sports/baseball/stats,,high
 West Georgia,D1,GSC,https://uwgathletics.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Illinois-Chicago,D1,Missouri Valley Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
-Arkansas-Pine Bluff,D1,Southwestern Athletic Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+Illinois-Chicago,D1,Missouri Valley Conference,https://uicflames.com,/sports/baseball/roster,/sports/baseball/stats,,high
+Arkansas-Pine Bluff,D1,Southwestern Athletic Conference,https://uapblionsroar.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Seattle,D1,WAC,https://goseattleu.com,/sports/baseball/roster,/sports/baseball/stats,,high
 UC Davis,D1,Big West,https://ucdavisaggies.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Sam Houston State,D1,C-USA,https://gobearkats.com,/sports/baseball/roster,/sports/baseball/stats,,high
 North Alabama,D1,ASUN,https://roarlions.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Bradley,D1,MVC,https://bradleybraves.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Delaware State,D1,MEAC,https://dsuhornets.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Loyola Marymount,D1,,,/sports/baseball/roster,/sports/baseball/stats,,high
+Loyola Marymount,D1,,https://lmulions.com,/sports/baseball/roster,/sports/baseball/stats,,high
 San Jose State,D1,MWC,https://sjsuspartans.com,/sports/baseball/roster,/sports/baseball/stats,,high
 UC San Diego,D1,Big West,https://ucsdtritons.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Bowling Green,D1,MAC,https://bgsufalcons.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -289,8 +289,8 @@ Princeton,D1,Ivy,https://goprincetontigers.com,/sports/baseball/roster,/sports/b
 Eastern Michigan,D1,MAC,https://emueagles.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Harvard,D1,Ivy,https://gocrimson.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Mercyhurst,D1,PSAC,https://hurstathletics.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Mississippi Valley State,D1,,,/sports/baseball/roster,/sports/baseball/stats,,high
-NJIT,D1,American East Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+Mississippi Valley State,D1,,https://mvsusports.com,/sports/baseball/roster,/sports/baseball/stats,,high
+NJIT,D1,American East Conference,https://njithighlanders.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Wright State,D1,Horizon,https://wsuraiders.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Coppin State,D1,MEAC,https://coppinstatesports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Canisius,D1,MAAC,https://gogriffs.com,/sports/baseball/roster,/sports/baseball/stats,,high
@@ -300,22 +300,22 @@ Stony Brook,D1,CAA,https://stonybrookathletics.com,/sports/baseball/roster,/spor
 Binghamton,D1,America East,https://bubearcats.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Pennsylvania,D1,Ivy,https://pennathletics.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Sacred Heart,D1,NEC,https://sacredheartpioneers.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Saint Peter's,D1,Metro Atlantic Athletic Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
-Albany,D1,,,/sports/baseball/roster,/sports/baseball/stats,,high
+Saint Peter's,D1,Metro Atlantic Athletic Conference,https://saintpeterspeacocks.com,/sports/baseball/roster,/sports/baseball/stats,,high
+Albany,D1,,https://ualbanysports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 North Dakota State,D1,Summit,https://gobison.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Evansville,D1,MVC,https://gopurpleaces.com,/sports/baseball/roster,/sports/baseball/stats,,high
-Queens University of Charlotte,D1,Atlantic Sun Conference,,/sports/baseball/roster,/sports/baseball/stats,,high
+Queens University of Charlotte,D1,Atlantic Sun Conference,https://queensathletics.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Fairfield,D1,MAAC,https://fairfieldstags.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Youngstown State,D1,Horizon,https://ysusports.com,/sports/baseball/roster,/sports/baseball/stats,,high
 Adams State,D2,RMAC,https://asugrizzlies.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Adelphi,D2,NE-10,https://aupanthers.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Alabama–Huntsville,D2,Gulf South,https://uahchargers.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Albany State,D2,SIAC,https://asugoldenrams.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-American International,D2,NE-10,,/sports/baseball/roster,/sports/baseball/stats,,medium
+American International,D2,NE-10,https://aicyellowjackets.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Anderson,D2,SAC,https://andersontrojans.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Angelo State,D2,Lone Star,https://angelosports.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Arkansas Tech,D2,GAC,https://arkansastechsports.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-Arkansas–Fort Smith,D2,MIAA,,/sports/baseball/roster,/sports/baseball/stats,,medium
+Arkansas–Fort Smith,D2,MIAA,https://uafortsmithlions.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Arkansas–Monticello,D2,GAC,https://uamboilweevils.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Ashland,D2,G-MAC,https://goashlandeagles.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Assumption,D2,NE-10,https://assumptiongreyhounds.com,/sports/baseball/roster,/sports/baseball/stats,,medium
@@ -331,8 +331,8 @@ Benedict,D2,SIAC,https://benedicttigers.com,/sports/baseball/roster,/sports/base
 Bentley,D2,NE-10,https://bentleyfalcons.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Biola,D2,PacWest,https://biolaeagles.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Bloomsburg,D2,PSAC,https://buhuskies.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-Bluefield State,D2,Independent,,/sports/baseball/roster,/sports/baseball/stats,,medium
-Bridgeport,D2,CACC,,/sports/baseball/roster,/sports/baseball/stats,,medium
+Bluefield State,D2,Independent,https://gobstate.com,/sports/baseball/roster,/sports/baseball/stats,,medium
+Bridgeport,D2,CACC,https://ubknights.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Caldwell,D2,CACC,https://caldwellcougars.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Cal Poly Pomona,D2,CCAA,https://broncoathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Cal State Dominguez Hills,D2,CCAA,https://gotoros.com,/sports/baseball/roster,/sports/baseball/stats,,medium
@@ -340,7 +340,7 @@ Cal State East Bay,D2,CCAA,https://caborathletics.com,/sports/baseball/roster,/s
 Cal State Los Angeles,D2,CCAA,https://calstatela.com/athletics,/sports/baseball/roster,/sports/baseball/stats,,medium
 Cal State Monterey Bay,D2,CCAA,https://otterathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Cal State San Bernardino,D2,CCAA,https://csusbathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-Cal State San Marcos,D2,CCAA,,/sports/baseball/roster,/sports/baseball/stats,,medium
+Cal State San Marcos,D2,CCAA,https://csusmcougars.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Cal State Stanislaus,D2,CCAA,https://csustanwarriors.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 California (PA),D2,PSAC,https://calvulcans.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Cameron,D2,Lone Star,https://cameronaggies.com,/sports/baseball/roster,/sports/baseball/stats,,medium
@@ -352,7 +352,7 @@ Central Oklahoma,D2,MIAA,https://bronchosports.com,/sports/baseball/roster,/spor
 Central Washington,D2,GNAC,https://wildcatsports.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Chaminade,D2,PacWest,https://goswords.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Charleston (WV),D2,MEC,https://ucgoldeneagles.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-Chestnut Hill,D2,CACC,,/sports/baseball/roster,/sports/baseball/stats,,medium
+Chestnut Hill,D2,CACC,https://griffinathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Chico State,D2,CCAA,https://chicowildcats.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Chowan,D2,Carolinas,https://gocuhawks.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Christian Brothers,D2,Gulf South,https://cbubucs.com,/sports/baseball/roster,/sports/baseball/stats,,medium
@@ -365,7 +365,7 @@ Colorado Mines,D2,RMAC,https://cmumavericks.com,/sports/baseball/roster,/sports/
 Columbus State,D2,Peach Belt,https://csucougars.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Concord,D2,MEC,https://concordathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Concordia–Irvine,D2,PacWest,https://cuieagles.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-Concordia–St. Paul,D2,NSIC,,/sports/baseball/roster,/sports/baseball/stats,,medium
+Concordia–St. Paul,D2,NSIC,https://cspbears.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Coker,D2,SAC,https://cokercobras.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 CSU Pueblo,D2,RMAC,https://gothunderwolves.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Davenport,D2,GLIAC,https://davenportpanthers.com,/sports/baseball/roster,/sports/baseball/stats,,medium
@@ -378,7 +378,7 @@ East Central,D2,GAC,https://ectigerathletics.com,/sports/baseball/roster,/sports
 East Stroudsburg,D2,PSAC,https://esuwarriors.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Eastern New Mexico,D2,Lone Star,https://goeasternathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Eckerd,D2,SSC,https://eckerdtritons.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-Edward Waters,D2,SIAC,,/sports/baseball/roster,/sports/baseball/stats,,medium
+Edward Waters,D2,SIAC,https://ewutigerpride.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Embry–Riddle,D2,SSC,https://erauathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Emmanuel,D2,Carolinas,https://ecgalions.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Emory & Henry,D2,SAC,https://ehcwasps.com,/sports/baseball/roster,/sports/baseball/stats,,medium
@@ -411,9 +411,9 @@ Hillsdale,D2,G-MAC,https://hillsdalechargers.com,/sports/baseball/roster,/sports
 Holy Family,D2,CACC,https://holyfamilytigers.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Indianapolis,D2,GLVC,https://athletics.uindy.edu,/sports/baseball/roster,/sports/baseball/stats,,medium
 IUP,D2,PSAC,https://iuphawks.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-Jamestown,D2,NSIC,,/sports/baseball/roster,/sports/baseball/stats,,medium
+Jamestown,D2,NSIC,https://jimmiepride.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Jefferson,D2,CACC,https://jeffersonrams.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-Jessup,D2,PacWest,,/sports/baseball/roster,/sports/baseball/stats,,medium
+Jessup,D2,PacWest,https://jessupathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Kentucky State,D2,SIAC,https://ksuthorobreds.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Kentucky Wesleyan,D2,G-MAC,https://kwcpanthers.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 King,D2,Carolinas,https://gotornado.com,/sports/baseball/roster,/sports/baseball/stats,,medium
@@ -425,7 +425,7 @@ Lee,D2,Gulf South,https://leeflames.com,/sports/baseball/roster,/sports/baseball
 LeMoyne–Owen,D2,SIAC,https://athletics.loc.edu,/sports/baseball/roster,/sports/baseball/stats,,medium
 Lenoir–Rhyne,D2,SAC,https://lrbears.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Lewis,D2,GLVC,https://lewisflyers.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-Lincoln (MO),D2,GLVC,,/sports/baseball/roster,/sports/baseball/stats,,medium
+Lincoln (MO),D2,GLVC,https://lubluetigers.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Lincoln (PA),D2,CACC,https://lulions.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Lincoln Memorial,D2,SAC,https://lmurailsplitters.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Lock Haven,D2,PSAC,https://lockhavenathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
@@ -437,29 +437,29 @@ Mars Hill,D2,SAC,https://marshilllions.com,/sports/baseball/roster,/sports/baseb
 Mary,D2,NSIC,https://goumary.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Maryville (MO),D2,GLVC,https://maryvillesaints.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 McKendree,D2,GLVC,https://mckbearcats.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-Menlo,D2,PacWest,,/sports/baseball/roster,/sports/baseball/stats,,medium
-Mercy,D2,ECC,,/sports/baseball/roster,/sports/baseball/stats,,medium
-Metropolitan State,D2,RMAC,,/sports/baseball/roster,/sports/baseball/stats,,medium
-Middle Georgia,D2,Peach Belt,,/sports/baseball/roster,/sports/baseball/stats,,medium
+Menlo,D2,PacWest,https://menlooaks.com,/sports/baseball/roster,/sports/baseball/stats,,medium
+Mercy,D2,ECC,https://mercyathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
+Metropolitan State,D2,RMAC,https://roadrunnersathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
+Middle Georgia,D2,Peach Belt,https://mgaknights.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Miles,D2,SIAC,https://milesgoldenbears.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Millersville,D2,PSAC,https://millersvilleathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Minnesota State,D2,NSIC,https://maverickssports.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Minnesota–Crookston,D2,NSIC,https://goldeneaglesports.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Minnesota–Duluth,D2,NSIC,https://umdbulldogs.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-Minot State,D2,NSIC,,/sports/baseball/roster,/sports/baseball/stats,,medium
+Minot State,D2,NSIC,https://msubeavers.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Mississippi College,D2,Gulf South,https://gochoctaws.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Missouri Southern,D2,MIAA,https://mssulions.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Missouri S&T,D2,GLVC,https://minerathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Missouri Western,D2,MIAA,https://gogriffons.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Molloy,D2,ECC,https://molloylions.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Montana State–Billings,D2,GNAC,https://msubsports.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-Montevallo,D2,Gulf South,,/sports/baseball/roster,/sports/baseball/stats,,medium
+Montevallo,D2,Gulf South,https://montevallofalcons.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Morehouse,D2,SIAC,https://morehouseathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Mount Olive,D2,Carolinas,https://umotrojans.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 New Mexico Highlands,D2,RMAC,https://nmhucowboys.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Newberry,D2,SAC,https://newberrywolves.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-Newman,D2,MIAA,,/sports/baseball/roster,/sports/baseball/stats,,medium
-North Georgia,D2,Peach Belt,,/sports/baseball/roster,/sports/baseball/stats,,medium
+Newman,D2,MIAA,https://newmanjets.com,/sports/baseball/roster,/sports/baseball/stats,,medium
+North Georgia,D2,Peach Belt,https://ungathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 North Greenville,D2,Carolinas,https://ngucrusaders.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Northeastern State,D2,MIAA,https://nsuriverhawks.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Northern State,D2,NSIC,https://nsuwolves.com,/sports/baseball/roster,/sports/baseball/stats,,medium
@@ -470,24 +470,24 @@ Northwood,D2,G-MAC,https://northwoodtimberwolves.com,/sports/baseball/roster,/sp
 Nova Southeastern,D2,SSC,https://nsusharks.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Ohio Dominican,D2,G-MAC,https://ohiodominicanpanthers.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Oklahoma Baptist,D2,GAC,https://obubison.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-Oklahoma Christian,D2,Lone Star,,/sports/baseball/roster,/sports/baseball/stats,,medium
+Oklahoma Christian,D2,Lone Star,https://oceagles.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Ouachita Baptist,D2,GAC,https://obutigers.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Pace,D2,NE-10,https://paceuathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Palm Beach Atlantic,D2,SSC,https://pbasailfish.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Parkside,D2,GLIAC,https://parksiderangers.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Pittsburg State,D2,MIAA,https://pittstgorillas.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-Pitt–Johnstown,D2,PSAC,,/sports/baseball/roster,/sports/baseball/stats,,medium
-Point Loma Nazarene,D2,PacWest,,/sports/baseball/roster,/sports/baseball/stats,,medium
-Point Park,D2,MEC,,/sports/baseball/roster,/sports/baseball/stats,,medium
+Pitt–Johnstown,D2,PSAC,https://pittjohnstownathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
+Point Loma Nazarene,D2,PacWest,https://plnusealions.com,/sports/baseball/roster,/sports/baseball/stats,,medium
+Point Park,D2,MEC,https://pointparksports.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Post,D2,CACC,https://posteagles.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Purdue Northwest,D2,GLIAC,https://pnwathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Queens (NY),D2,ECC,https://queensknights.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Quincy,D2,GLVC,https://quhawks.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-Regis,D2,RMAC,,/sports/baseball/roster,/sports/baseball/stats,,medium
+Regis,D2,RMAC,https://regisrangers.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Rockhurst,D2,GLVC,https://rockhursthawks.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Rogers State,D2,MIAA,https://rsuhillcats.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Rollins,D2,SSC,https://rollinssports.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-Roosevelt,D2,GLIAC,,/sports/baseball/roster,/sports/baseball/stats,,medium
+Roosevelt,D2,GLIAC,https://rooseveltlakers.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Saginaw Valley State,D2,GLIAC,https://svsuathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Saint Anselm,D2,NE-10,https://saintanselmhawks.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 St. Cloud State,D2,NSIC,https://scsuhuskies.com,/sports/baseball/roster,/sports/baseball/stats,,medium
@@ -523,24 +523,24 @@ Texas A&M International,D2,Lone Star,https://godustdevils.com,/sports/baseball/r
 Texas A&M–Kingsville,D2,Lone Star,https://javelinaathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Thomas More,D2,G-MAC,https://thomasmoresports.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Tiffin,D2,G-MAC,https://gotiffindragons.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-Trevecca Nazarene,D2,Gulf South,,/sports/baseball/roster,/sports/baseball/stats,,medium
+Trevecca Nazarene,D2,Gulf South,https://tnutrojans.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Truman,D2,GLVC,https://trumanbulldogs.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Tusculum,D2,SAC,https://tusculumpioneers.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Tuskegee,D2,SIAC,https://goldentigersports.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-UCCS,D2,RMAC,,/sports/baseball/roster,/sports/baseball/stats,,medium
+UCCS,D2,RMAC,https://gomountainlions.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 UIS,D2,GLVC,https://uisprairiestars.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-UMSL,D2,GLVC,,/sports/baseball/roster,/sports/baseball/stats,,medium
+UMSL,D2,GLVC,https://umsltritons.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 UNC Pembroke,D2,Carolinas,https://uncpbraves.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-Union,D2,Gulf South,,/sports/baseball/roster,/sports/baseball/stats,,medium
+Union,D2,Gulf South,https://unionathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Upper Iowa,D2,GLVC,https://uiupeacocks.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 USC Aiken,D2,Peach Belt,https://pacersports.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-USC Beaufort,D2,Peach Belt,,/sports/baseball/roster,/sports/baseball/stats,,medium
+USC Beaufort,D2,Peach Belt,https://uscbathletics.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 UT Dallas,D2,Lone Star,https://utdcomets.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 UT Permian Basin,D2,Lone Star,https://utpbfalcons.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 UT Tyler,D2,Lone Star,https://uttylerpatriots.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 UVA Wise,D2,SAC,https://uvawisecavaliers.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Valdosta State,D2,Gulf South,https://vstateblazers.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-Vanguard,D2,PacWest,,/sports/baseball/roster,/sports/baseball/stats,,medium
+Vanguard,D2,PacWest,https://vanguardlions.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Virginia State,D2,Independent,https://govsutrojans.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Walsh,D2,G-MAC,https://walshcavaliers.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Washburn,D2,MIAA,https://wusports.com,/sports/baseball/roster,/sports/baseball/stats,,medium
@@ -552,9 +552,9 @@ West Florida,D2,Gulf South,https://goargos.com,/sports/baseball/roster,/sports/b
 West Liberty,D2,MEC,https://hilltoppersports.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 West Texas A&M,D2,Lone Star,https://gobuffsgo.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 West Virginia State,D2,MEC,https://wvsuyellowjackets.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-West Virginia Wesleyan,D2,MEC,,/sports/baseball/roster,/sports/baseball/stats,,medium
+West Virginia Wesleyan,D2,MEC,https://wesleyanbobcats.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Western Oregon,D2,GNAC,https://wouwolves.com,/sports/baseball/roster,/sports/baseball/stats,,medium
-Westmont,D2,PacWest,,/sports/baseball/roster,/sports/baseball/stats,,medium
+Westmont,D2,PacWest,https://athletics.westmont.edu,/sports/baseball/roster,/sports/baseball/stats,,medium
 Wheeling,D2,MEC,https://wucardinals.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 William Jewell,D2,GLVC,https://jewellcardinals.com,/sports/baseball/roster,/sports/baseball/stats,,medium
 Wilmington,D2,CACC,https://wilmu.edu/athletics,/sports/baseball/roster,/sports/baseball/stats,,medium
@@ -574,7 +574,7 @@ Neumann,D3,CSAC,https://neumannathletics.com,/sports/baseball/roster,/sports/bas
 Marymount,D3,CAC,https://marymountsaints.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Gwynedd Mercy,D3,Atlantic East,https://gwyneddathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Immaculata,D3,CSAC,https://immaculataathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
-St. Elizabeth,D3,,,/sports/baseball/roster,/sports/baseball/stats,,low
+St. Elizabeth,D3,,https://seueagles.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Centenary,D3,CSAC,https://centenarygators.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Wartburg,D3,American Rivers,https://wartburgsports.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Luther,D3,American Rivers,https://luthernorse.com,/sports/baseball/roster,/sports/baseball/stats,,low
@@ -612,11 +612,11 @@ Carthage,D3,CCIW,https://carthagesports.com,/sports/baseball/roster,/sports/base
 North Central (Ill.),D3,CCIW,https://northcentralcardinals.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Illinois Wesleyan,D3,CCIW,https://iwusports.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Huntingdon,D3,USA South,https://huntingdonhawks.com,/sports/baseball/roster,/sports/baseball/stats,,low
-Asbury,D3,Collegiate Conference of the South,,/sports/baseball/roster,/sports/baseball/stats,,low
+Asbury,D3,Collegiate Conference of the South,https://asburyeagles.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Piedmont,D3,USA South,https://piedmontlions.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Maryville (Tenn.),D3,USA South,https://mcscotsathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Covenant,D3,USA South,https://covenantscots.com,/sports/baseball/roster,/sports/baseball/stats,,low
-Belhaven,D3,Collegiate Conference of the South,,/sports/baseball/roster,/sports/baseball/stats,,low
+Belhaven,D3,Collegiate Conference of the South,https://blazers.belhaven.edu,/sports/baseball/roster,/sports/baseball/stats,,low
 LaGrange,D3,USA South,https://lagrangepanthers.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Roger Williams,D3,CCC,https://rwuhawks.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Endicott,D3,CCC,https://endicottathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
@@ -643,7 +643,7 @@ Brockport,D3,SUNYAC,https://brockportathletics.com,/sports/baseball/roster,/spor
 SUNY Poly,D3,NEAC,https://sunypoly.edu/athletics,/sports/baseball/roster,/sports/baseball/stats,,low
 St. Joseph's (Maine),D3,Skyline,https://sjliathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Dean,D3,GNAC,https://deanathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
-St. Joseph (Conn.),D3,,,/sports/baseball/roster,/sports/baseball/stats,,low
+St. Joseph (Conn.),D3,,https://www.usjbluejays.com,/sports/baseball/roster,/sports/bsb/2025-26/teams/saintjosephconn?view=lineup,,low
 Lasell,D3,GNAC,https://golaselllasers.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Mitchell,D3,GNAC,https://mitchellathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Elms,D3,GNAC,https://elmsblazers.com,/sports/baseball/roster,/sports/baseball/stats,,low
@@ -662,7 +662,7 @@ Earlham,D3,Heartland,https://earlhamathletics.com,/sports/baseball/roster,/sport
 Mount St. Joseph,D3,Heartland,https://msjlions.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Hanover,D3,Heartland,https://athletics.hanover.edu,/sports/baseball/roster,/sports/baseball/stats,,low
 Berea,D3,USA South,https://bereamountaineers.com,/sports/baseball/roster,/sports/baseball/stats,,low
-Maranatha Baptist,D3,,,/sports/baseball/roster,/sports/baseball/stats,,low
+Maranatha Baptist,D3,,https://mbusabercats.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Elizabethtown,D3,Landmark,https://etownbluejays.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Wilkes,D3,MAC,https://wilkesathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Drew,D3,Landmark,https://drewrangers.com,/sports/baseball/roster,/sports/baseball/stats,,low
@@ -691,7 +691,7 @@ Rochester,D3,UAA,https://uofrathletics.com,/sports/baseball/roster,/sports/baseb
 Clarkson,D3,Liberty League,https://clarksonathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Ithaca,D3,Liberty League,https://ithacabombers.com,/sports/baseball/roster,/sports/baseball/stats,,low
 St. Lawrence,D3,Liberty League,https://saintsathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
-Rochester Tech,D3,Liberty League,,/sports/baseball/roster,/sports/baseball/stats,,low
+Rochester Tech,D3,Liberty League,https://ritathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Hood,D3,MAC,https://hoodathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Albright,D3,MAC,https://albrightlions.com,/sports/baseball/roster,/sports/baseball/stats,,low
 York (Pa.),D3,CAC,https://ycp.edu/athletics,/sports/baseball/roster,/sports/baseball/stats,,low
@@ -711,7 +711,7 @@ King's,D3,MAC,https://kingsmonarchs.com,/sports/baseball/roster,/sports/baseball
 Bridgewater State,D3,MASCAC,https://bsubears.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Massachusetts Maritime,D3,Little East,https://mmabucs.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Anna Maria,D3,GNAC,https://amcatssports.com,/sports/baseball/roster,/sports/baseball/stats,,low
-Massachusetts College,D3,,,/sports/baseball/roster,/sports/baseball/stats,,low
+Massachusetts College,D3,,https://mclabobcats.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Salem State,D3,MASCAC,https://salemstatevikings.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Framingham State,D3,MASCAC,https://www.fsurams.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Worcester State,D3,MASCAC,https://www.wsulancers.com,/sports/baseball/roster,/sports/baseball/stats,,low
@@ -748,7 +748,7 @@ Maine-Presque Isle,D3,NAC,https://umpiathletics.com,/sports/baseball/roster,/spo
 Husson,D3,NAC,https://hussonathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Maine-Farmington,D3,NAC,https://umfathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Thomas,D3,NAC,https://athletics.thomas.edu,/sports/baseball/roster,/sports/baseball/stats,,low
-Lesley,D3,,,/sports/baseball/roster,/sports/baseball/stats,,low
+Lesley,D3,,https://lesleyathletics.com,/sports/baseball/roster,/sports/bsb/2025-26/teams/lesley?view=lineup,,low
 VTSU Lyndon,D3,NAC,https://nvuathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 SUNY-Cobleskill,D3,NEAC,https://cobleskillsports.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Rockford,D3,NACC,https://rockfordregents.com,/sports/baseball/roster,/sports/baseball/stats,,low
@@ -787,7 +787,7 @@ Salve Regina,D3,CCC,https://salveathletics.com,/sports/baseball/roster,/sports/b
 WPI,D3,NEWMAC,https://athletics.wpi.edu,/sports/baseball/roster,/sports/baseball/stats,,low
 Wheaton (Mass.),D3,NEWMAC,https://wheatoncollegelyons.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Springfield,D3,NEWMAC,https://springfieldcollege.edu/athletics,/sports/baseball/roster,/sports/baseball/stats,,low
-Clark,D3,New England Women's & Men's Athletic Conference,,/sports/baseball/roster,/sports/baseball/stats,,low
+Clark,D3,New England Women's & Men's Athletic Conference,https://clarkathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Coast Guard,D3,NEWMAC,https://coastguardbears.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Babson,D3,NEWMAC,https://babsonathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Emerson,D3,NEWMAC,https://emersonlions.com,/sports/baseball/roster,/sports/baseball/stats,,low
@@ -856,12 +856,12 @@ Hendrix,D3,SAA,https://hendrixwarriors.com,/sports/baseball/roster,/sports/baseb
 Concordia (Texas),D3,ASC,https://ctxathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 LeTourneau,D3,ASC,https://letuyellowjackets.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Austin,D3,SCAC,https://acroos.com,/sports/baseball/roster,/sports/baseball/stats,,low
-St. Thomas (Texas),D3,Southern Collegiate Athletic Conference,,/sports/baseball/roster,/sports/baseball/stats,,low
+St. Thomas (Texas),D3,Southern Collegiate Athletic Conference,https://ustcelts.com,/sports/baseball/roster,/sports/baseball/stats,,low
 University of Dallas,D3,SCAC,https://udallasathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Schreiner,D3,SCAC,https://schreinerathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 McMurry,D3,ASC,https://mcmurrysports.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Centenary (La.),D3,SCAC,https://gocentenary.com,/sports/baseball/roster,/sports/baseball/stats,,low
-University of the Ozarks,D3,Southern Collegiate Athletic Conference,,/sports/baseball/roster,/sports/baseball/stats,,low
+University of the Ozarks,D3,Southern Collegiate Athletic Conference,https://uofoathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Cal Lutheran,D3,SCIAC,https://clusports.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Occidental,D3,SCIAC,https://oxyathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Claremont-Mudd-Scripps,D3,SCIAC,https://cmsathletics.org,/sports/baseball/roster,/sports/baseball/stats,,low
@@ -872,19 +872,19 @@ Chapman,D3,SCIAC,https://chapmanathletics.com,/sports/baseball/roster,/sports/ba
 Whittier,D3,SCIAC,https://wcpoets.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Caltech,D3,SCIAC,https://gocaltech.com,/sports/baseball/roster,/sports/baseball/stats,,low
 St. Joseph's (L.I.),D3,Skyline,https://sjliathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
-Manhattanville,D3,Skyline Conference,,/sports/baseball/roster,/sports/baseball/stats,,low
+Manhattanville,D3,Skyline Conference,https://govaliants.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Merchant Marine,D3,Independent,https://usmmasports.com,/sports/baseball/roster,/sports/baseball/stats,,low
 SUNY-Old Westbury,D3,Skyline,https://oldwestburypanthers.com,/sports/baseball/roster,/sports/baseball/stats,,low
-Mount St. Mary,D3,Metro Atlantic Athletic Conference,,/sports/baseball/roster,/sports/baseball/stats,,low
+Mount St. Mary,D3,Metro Atlantic Athletic Conference,https://msmcknights.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Farmingdale State,D3,Skyline,https://farmingdalesports.com,/sports/baseball/roster,/sports/baseball/stats,,low
 SUNY-Purchase,D3,Skyline,https://purchaseathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 SUNY-Maritime,D3,Skyline,https://sunymaritimeathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
-Mount St. Vincent,D3,Skyline,,/sports/baseball/roster,/sports/baseball/stats,,low
+Mount St. Vincent,D3,Skyline,https://umsvathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 St. Joseph's (Bklyn.),D3,Skyline,https://sjbkathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Yeshiva,D3,Skyline,https://yumacs.com,/sports/baseball/roster,/sports/baseball/stats,,low
-Lyon,D3,St. Louis Intercollegiate Athletic Conference,,/sports/baseball/roster,/sports/baseball/stats,,low
+Lyon,D3,St. Louis Intercollegiate Athletic Conference,https://lyonscots.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Spalding,D3,SLIAC,https://spaldingathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
-MUW,D3,,,/sports/baseball/roster,/sports/baseball/stats,,low
+MUW,D3,,https://owlsathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Westminster (Mo.),D3,UMAC,https://westminsterbluejays.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Webster,D3,SLIAC,https://websterathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Blackburn,D3,SLIAC,https://blackburnathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
@@ -903,7 +903,7 @@ Brandeis,D3,UAA,https://brandeisjudges.com,/sports/baseball/roster,/sports/baseb
 Case Western Reserve,D3,UAA,https://athletics.case.edu,/sports/baseball/roster,/sports/baseball/stats,,low
 Emory,D3,UAA,https://emoryathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Chicago,D3,UAA,https://athletics.uchicago.edu,/sports/baseball/roster,/sports/baseball/stats,,low
-New York University,D3,University Athletic Association,,/sports/baseball/roster,/sports/baseball/stats,,low
+New York University,D3,University Athletic Association,https://gonyuathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Lancaster Bible,D3,NEAC,https://lbcathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 St. Mary's (Md.),D3,CAC,https://smcmsports.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Penn State-Berks,D3,NEAC,https://berksnittanylions.com,/sports/baseball/roster,/sports/baseball/stats,,low
@@ -918,7 +918,7 @@ Notre Dame (Md.),D3,CSAC,https://notredamegators.com,/sports/baseball/roster,/sp
 Rosemont,D3,CSAC,https://rosemontathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Cairn,D3,CSAC,https://cairnhighlanders.com,/sports/baseball/roster,/sports/baseball/stats,,low
 UW-Superior,D3,WIAC,https://uwsyellowjackets.com,/sports/baseball/roster,/sports/baseball/stats,,low
-Bethany Lutheran,D3,Upper Midwest Athletic Conference,,/sports/baseball/roster,/sports/baseball/stats,,low
+Bethany Lutheran,D3,Upper Midwest Athletic Conference,https://blcvikings.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Martin Luther,D3,UMAC,https://mlcknights.com,/sports/baseball/roster,/sports/baseball/stats,,low
 North Central (Minn.),D3,CCIW,https://northcentralcardinals.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Northwestern (Minn.),D3,UMAC,https://unweagles.com,/sports/baseball/roster,/sports/baseball/stats,,low
@@ -928,10 +928,10 @@ Pfeiffer,D3,USA South,https://pfeifferfalcons.com,/sports/baseball/roster,/sport
 Brevard,D3,USA South Athletic Conference,https://brevard.edu,/sports/baseball/roster,/sports/baseball/stats,,low
 Greensboro,D3,USA South,https://greensboropride.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Methodist,D3,USA South,https://methodistathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
-North Carolina Wesleyan,D3,,,/sports/baseball/roster,/sports/baseball/stats,,low
+North Carolina Wesleyan,D3,,https://ncwsports.com,/sports/baseball/roster,/sports/baseball/stats,,low
 Southern Virginia,D3,CAC,https://svuknights.com,/sports/baseball/roster,/sports/baseball/stats,,low
-Mary Baldwin,D3,,,/sports/baseball/roster,/sports/baseball/stats,,low
-William Peace,D3,USA South,,/sports/baseball/roster,/sports/baseball/stats,,low
+Mary Baldwin,D3,,https://marybaldwinathletics.com,/sports/baseball/roster,/sports/baseball/stats,,low
+William Peace,D3,USA South,https://gopeacepacers.com,/sports/baseball/roster,/sports/baseball/stats,,low
 UW-River Falls,D3,WIAC,https://uwrfsports.com,/sports/baseball/roster,/sports/baseball/stats,,low
 UW-Platteville,D3,WIAC,https://letsgopioneers.com,/sports/baseball/roster,/sports/baseball/stats,,low
 UW-Whitewater,D3,WIAC,https://uwwsports.com,/sports/baseball/roster,/sports/baseball/stats,,low
